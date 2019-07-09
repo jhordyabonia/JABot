@@ -1,0 +1,131 @@
+<html lang="en"><head>
+	<meta charset="UTF-8">
+	<title>Editor files JABOT</title>
+     <style type="text/css">
+	.system
+    {
+        color:green;
+        font-weight: 600;
+    }
+	.command
+    {
+        color:blue;
+    }
+	.text
+    {
+        color:orange;
+    }
+	.key
+    {
+        color:green;
+    }
+	.error
+    {
+        color:red;
+        font-weight: 600;
+    }
+    #view
+    {
+        height: 300px;
+        width: 300px;
+        background-color: whitesmoke;
+        border: solid gray 1px;
+    }
+  </style>
+  <script type="text/javascript">
+  window.onload=load;
+  function load()
+  {
+        raw=document.getElementById('raw');
+        raw.onkeypress=keyPress;
+        raw.onchange=change;
+        raw.focus=true;
+        change("");
+  }
+  function keyPress(e)
+  {change(e.key);}
+  function change(e)
+  {       
+        if(typeof(e)=="string")
+        {
+            if(e.length>1||e==",")
+            e="";
+        }else e="";
+        view=document.getElementById('view');
+        view.innerHTML=target(raw.value+e); 
+        tmp=document.getElementsByTagName("span"); 
+         for(cmd in tmp)
+            tmp[cmd].onclick=function(i){edit(this);}; 
+        function edit(IN)
+        {
+            tmp_val=IN.innerText;
+            IN.onclick="";
+            IN.innerHTML="<input id='IN'>";
+            document.getElementById('IN').focus=true;
+            document.getElementById('IN').value=tmp_val;
+            document.getElementById('IN').onchange=
+                function()
+                {
+                    IN.onclick=function(i){edit(this);}; 
+                    IN.innerHTML=laws(document.getElementById('IN').value);
+                    document.getElementById('raw').focus=true;
+                    change();
+                };
+        }  
+   }
+   function target(data)
+   {
+        out="";
+        tmp=data.split(",");
+        for(cmd in tmp)
+            out+=laws(tmp[cmd])+",";        
+        out=out.replace(0,out.length-1);
+        return out+"<span style='cursor:pointer;' class='error'> + </span>";
+   }
+    function laws(IN)
+    {
+        IN=IN.trim();
+        tag='command';
+        if(IN.indexOf("[SYSTEM ")>=0)
+            tag='system';
+        else if(IN.indexOf("[WAIT ")>=0)
+            tag='system';
+        else if(IN.indexOf("::")>=0&&!IN.startsWith("["))
+            tag='text';
+        else if(IN.startsWith("[/"))
+            tag='key';
+        else if(IN.endsWith("/]"))
+            tag='key';
+        else if(IN.startsWith("[")&&IN.length<4)
+            tag='key';
+        
+        if(!IN.endsWith("]"))
+            if(tag!="text")
+                tag='error';
+        
+        if(IN.indexOf("][")>=0)
+                tag='error';
+
+        return "<span class='"+tag+"'>"+IN+"</span>";
+    }
+  </script>
+</head>
+<body> 
+	<textarea id="raw">
+        [SYSTEM RUN],[WAIT 100],notepad::300,[ENTER/]
+    </textarea>
+    <div id="view">
+        <span class="system">
+        [SYSTEM RUN]
+        </span><br>
+        <span class="error">
+        [SYSTEM RUN]
+        </span><br>
+        <span class="command">
+        [SYSTEM RUN]
+        </span><br>
+        <span class="text">
+        my text::300
+        </span>        
+    </div>
+</body></html>

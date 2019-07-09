@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Server",
+            "request": "launch",
+            "mainClass": "COM.Server",
+            "projectName": "Robot"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Client",
+            "request": "launch",
+            "mainClass": "COM.Client",
+            "projectName": "Robot"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Server",
+            "request": "launch",
+            "mainClass": "Server",
+            "projectName": "Robot"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Bot",
+            "request": "launch",
+            "mainClass": "core.Bot",
+            "projectName": "Robot"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Phanton",
+            "request": "launch",
+            "mainClass": "Tools.Phanton",
+            "projectName": "Robot"
+        }
+    ]
+}

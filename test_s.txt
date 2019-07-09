@@ -1,0 +1,3 @@
+[SYSTEM RUN]
+www.google.com::500
+[ENTER/]

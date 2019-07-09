@@ -1,0 +1,15 @@
+[SYSTEM DESKTOP]
+[SYSTEM RUN]
+www.proveedor.com.co::500
+[ENTER/]
+[WAIT 10000]
+[TAB/]
+[ENTER/]
+[TAB/]
+[TAB/]
+newtester::400
+[TAB/]
+123456::100
+[TAB/]
+[TAB/]
+[ENTER/]

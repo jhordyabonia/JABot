@@ -1,0 +1,49 @@
+::OPEN
+::KILL
+[SYSTEM RUN],[WAIT 1000],taskkill /im opera.exe,[ENTER/],[WAIT 5000]
+::KILL
+[SYSTEM RUN],[WAIT 1000],opera /private,[ENTER/],[WAIT 5000]
+::OPEN
+::VPN
+::VPN
+[WAIT 5000]
+[F6/],[F6/],[F6/],[WAIT 500]
+[TAB/],[WAIT 400],[TAB/],[WAIT 150], ::150,[WAIT 150], ::150
+[ESCAPE/],[WAIT 400],[F5/]
+[WAIT 5000]
+::VPN0
+::0
+[WAIT 5000]
+[ESCAPE/]
+[MOUSE M 148 44]
+[WAIT 1100]
+[MOUSE L 0]
+[WAIT 100]
+[MOUSE L 1]
+::0
+::ACTIVE
+[WAIT 1000]
+[MOUSE M 240 430]
+[WAIT 600]
+[MOUSE L 0]
+[WAIT 100]
+[MOUSE L 1]
+::ACTIVE
+::USD
+[OPERA_.do 0]
+[OPERA_.do ACTIVE]
+[WAIT 100]
+[MOUSE M 239 507]
+[MOUSE M 238 507]
+[WAIT 2100]
+[MOUSE L 0]
+[WAIT 100]
+[MOUSE L 1]
+::USD
+::VPN
+::ATRAS
+[F5/],[WAIT 4567],[F6/],[WAIT 123], ::100,
+::ATRAS
+::DESCRIP
+Libreria de comandos del navegador Opera
+::DESCRIP

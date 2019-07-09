@@ -1,0 +1,6 @@
+[WAIT 2000]
+[SYSTEM RUN]
+notepad::500
+[ENTER/]
+[WAIT 2000]
+hola mundo:500

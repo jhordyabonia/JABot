@@ -1,0 +1,4 @@
+[SYSTEM RUN],[WAIT 100],notepad::300,[ENTER/],Hola soy exce::300,[ENTER/],Como te llamas?::200,[ENTER/],> ::300,[WAIT 3000],[HOLA_SOY_EXCE]
+::DESCRIP
+
+::DESCRIP

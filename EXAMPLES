@@ -1,0 +1,30 @@
+::GOOGLE
+[SYSTEM RUN]
+www.GOOGLE.com
+::GOOGLE
+::FACE_PROVEEDOR
+[SYSTEM RUN]
+www.facebook.com/proveedorcolombia/
+[ENTER/]
+[WAIT 10000]
+[REPEAT 28]
+[TAB/]
+[/REPEAT]
+::FACE_PROVEEDOR
+[WAIT 2000]
+::LOGIN
+[SYSTEM RUN]
+www.proveedor.com.co::500
+[ENTER/]
+[WAIT 4000]
+[TAB/]
+[ENTER/]
+[TAB/]
+[TAB/]
+newtester::500
+[TAB/]
+123456::500
+[TAB/]
+[TAB/]
+[SPACE/]
+::LOGIN
