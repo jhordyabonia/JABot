@@ -23,11 +23,23 @@ public abstract class Connection implements Runnable
     protected DataOutputStream out;
     protected DataInputStream in;
     protected String name="";
+    protected UserConnection user;
     
     protected Socket so;
 
+    public interface UserConnection{
+        public String read();
+        public void write(String data);
+    }
+
     public abstract void init();
 
+    public void setUser(UserConnection u){
+        user = u;
+    }
+    public UserConnection getUser(){
+        return user;
+    }
     public String getName(){
         return name;
     }
@@ -43,6 +55,9 @@ public abstract class Connection implements Runnable
                 do{
                     Thread.sleep(DELAY);
                     r =  in.readUTF();
+                    if(user != null){
+                        user.write(r);
+                    }
                 } while(r.isEmpty());
             } catch (IOException | InterruptedException ex) {                
                 System.out.println("There were errors! "+ex.getMessage());

@@ -5,7 +5,6 @@ package gui;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 import core.Bot;
 import java.awt.AWTException;
 import java.awt.Color;
@@ -363,18 +362,17 @@ public final class Admin extends javax.swing.JFrame {
     {          
          this.setExtendedState(ICONIFIED);
          java.awt.EventQueue.invokeLater(
-         new Runnable() 
-         {
+         new Runnable() {
             @Override
             public void run() 
             {               
                 String t="LOG: ",args[]={"-d",file};
-                try {Bot.main(args);} 
+                try {                    
+                    new Bot().Do(args.length>1?args[1]:null,args.length>2?args[2]:null);
+                }
                 catch (AWTException ex){t="ERROR:\n<Robot command not exist.>\n ";}
                 catch (IOException ex){t="ERROR:\n<JABot file not exist.>\n ";}
-                catch (InterruptedException ex){ t="ERROR:\n<System: unknown.>\n ";}
-                finally
-                {
+                finally{
                     err(t+file+" >>"+Bot.getLog());
                     setExtendedState( Frame.NORMAL);
                 }
@@ -603,20 +601,26 @@ public final class Admin extends javax.swing.JFrame {
                 {
                     @Override
                     public void actionPerformed(ActionEvent e) 
-                    {               
-                        String args[]={"-r","[SOURCE OPEN],"+S+",[SOURCE /OPEN]"};
-                        try {
-                            Bot.main(args);
-                        } catch (AWTException ex) {
-                            Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IOException ex) {
-                            Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        setVisible(true);
-                        System.out.println(">"+args[1]); 
-                    } 
+                    {          
+                        java.awt.EventQueue.invokeLater(
+                            new Runnable() {
+                                @Override
+                                public void run() 
+                                {      
+                                    String args[]={"-r","[SOURCE OPEN],"+S+",[SOURCE /OPEN]"};
+                                    try {
+                                        new Bot().Do_(args[1]);
+                                    } catch (AWTException ex) {
+                                        Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
+                                    } catch (IOException ex) {
+                                        Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                    setVisible(true);
+                                    System.out.println(">"+args[1]); 
+                                } 
+                            }
+                        );
+                    }
                 }
             );
         System.out.println(S);

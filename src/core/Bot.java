@@ -1,7 +1,5 @@
 package core;
-
-import gui.Admin;
-import java.awt.AWTException; 
+ 
 import java.awt.Robot; 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -15,9 +13,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
+import java.awt.AWTException; 
 
-public class Bot extends Robot
+
+public class Bot extends Robot 
 {
         private String[] dictionary;
         private boolean in_catch=false;
@@ -31,14 +30,13 @@ public class Bot extends Robot
         private String clipboard = "";
         private static int step=0;
         private static String path_fail="";
-        public static String getLog()
-        {
+        public static String getLog(){
             String e=""+path_fail;
             path_fail=""; step=0;
             return e;
         }        
     
-        Bot() throws AWTException
+        public Bot() throws AWTException
         { super();step=0;}
         public String[] get_dictionary()
         {
@@ -46,8 +44,8 @@ public class Bot extends Robot
         }
         public static boolean isPause(){return pause;}
         public static void pause(boolean p){ pause=p;}
-        public void stop(boolean p)
-        { pause=p;stop=true;
+        public void stop(boolean p){
+             pause=p;stop=true;
         }
         public void  load_dictinary(String file) throws FileNotFoundException, IOException
         {
@@ -596,39 +594,9 @@ public class Bot extends Robot
                 Do_(clipboard);
             } catch (IOException ex) { }     
             
-        }
-        
-        public void if_(String to_do)
-        {
+        }        
+        public void if_(String to_do){
             System.out.println(to_do);
         }
-	public static void main(String[] args) throws AWTException, IOException, InterruptedException
-        { 
-            Bot bot=new Bot();
-            bot.load_dictinary(null);
-            if(args.length<1)
-            { new Admin().setVisible(true);}
-            else if(args[0].contains("-d"))
-                bot.Do(args.length>1?args[1]:null,args.length>2?args[2]:null);
-            else if(args[0].contains("-r"))
-                bot.Do_(args[1]);
-            else if(args[0].contains("-i"))
-            {
-                MODE='i';
-                Scanner teclado = new Scanner(System.in);
-                String cadena;
-                do
-                {
-                    System.out.print(">"); 
-                    cadena =teclado.nextLine();
-                    bot.Do_(cadena.toUpperCase());
-                }while(!cadena.equals("EXIT"));
-            }else if (args[0].contains("-g"))
-            {
-               java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Admin().setVisible(true);
-            }
-        });}
-        }
+	
 } 
