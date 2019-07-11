@@ -18,6 +18,7 @@ import java.awt.AWTException;
 
 public class Bot extends Robot 
 {
+        public static final String JABOT_VERSION = "JABot 1.6";
         private String[] dictionary;
         private boolean in_catch=false;
         private static boolean pause=false;
@@ -68,7 +69,7 @@ public class Bot extends Robot
              }
              f.close(); 
              
-            System.out.println("JABot 1.5  dictionary:"+file);
+            System.out.println(JABOT_VERSION+"  dictionary: "+file);
         }
         public boolean releaseKey(char key) throws IOException
         {   return releaseKey(get_key(""+key)); }

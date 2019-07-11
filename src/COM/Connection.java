@@ -22,13 +22,15 @@ public abstract class Connection implements Runnable
     protected Thread runner = new Thread(this);
     protected DataOutputStream out;
     protected DataInputStream in;
+    protected OutputStream _out;
+    protected InputStream _in;
     protected String name="";
     protected UserConnection user;
     
     protected Socket so;
 
     public interface UserConnection{
-        public String read();
+        public void start(Connection c);
         public void write(String data);
     }
 
@@ -40,6 +42,15 @@ public abstract class Connection implements Runnable
     public UserConnection getUser(){
         return user;
     }
+    
+    public OutputStream getOutputStream(){
+        return _out;
+    }
+
+    public InputStream getInputStream(){
+        return _in;
+    }
+    
     public String getName(){
         return name;
     }
@@ -68,10 +79,16 @@ public abstract class Connection implements Runnable
     
     public final void acepted() throws IOException{
         System.out.println("Staring connection... ");        
-        out = new DataOutputStream(so.getOutputStream());
-        in = new DataInputStream(so.getInputStream());
-        System.out.println("Conection completed. "+so.getLocalAddress().getHostAddress());        
+        _out = so.getOutputStream();
+        _in = so.getInputStream();
+        out = new DataOutputStream(_out);
+        in = new DataInputStream(_in);
+        System.out.println("Conection completed. "+so.getInetAddress().getHostAddress());        
         runner.start();
+        
+        if(user != null){
+            user.start(this);
+        }
     }
     
     public final void close(){

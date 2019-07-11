@@ -32,7 +32,7 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
 {
     private PrintStream outL;
     private static long T=1;
-    private boolean rec=true;
+    private boolean rec = true;
     private JLabel R=new JLabel("R°");
     private long TIME = System.currentTimeMillis();
     
@@ -50,9 +50,9 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
         outL=t;        
 
         add(R,BorderLayout.NORTH);
-        R.setFont(new java.awt.Font("Verdana",java.awt.Font.BOLD, 36)); 
+        R.setFont(new java.awt.Font("Verdana",java.awt.Font.BOLD, 32)); 
         R.setForeground(Color.red); 
-        R.setVisible(false);
+        R.setVisible(rec);
         
         setUndecorated(true);
 
