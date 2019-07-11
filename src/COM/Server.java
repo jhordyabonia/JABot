@@ -37,6 +37,19 @@ public class Server extends Connection
         }catch(Exception e ){}
     }
     
+    @Override
+    public void close(){       
+        try {sc.close();}
+        catch (IOException ex) {}
+        super.close();
+    }
+    
+    @Override
+    public void startInteractive(){
+        super.startInteractive();
+        init();
+    }
+   
     public static void main(String []args){
         Server s = new Server("Server");
         s.startInteractive();

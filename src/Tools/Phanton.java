@@ -4,7 +4,10 @@
  * and open the template in the editor.
  */
 package Tools;
-
+import COM.Client;
+import COM.Connection;
+import COM.Connection.UserConnection;
+import javax.swing.SwingUtilities;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,10 +33,11 @@ import javax.swing.JLabel;
  */
 public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener 
 {
+    private Client client = null;
     private PrintStream outL;
     private static long T=1;
-    private boolean rec = true;
-    private JLabel R=new JLabel("R°");
+    private boolean rec = false;
+    private JLabel R = new JLabel("R°");
     private long TIME = System.currentTimeMillis();
     
     public Phanton() throws AWTException{
@@ -44,6 +48,21 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
     public Phanton(PrintStream t) throws AWTException{
         super();
         make(t);
+    }
+
+    public void connect(String s){
+        UserConnection u = new UserConnection() {            
+            public void write(String data){}
+            public void start(Connection c){
+                try{
+                    rec = true;
+                    setVisible(true);
+                }catch(Exception e){}
+            }
+        };
+        client = new Client(s);
+        client.setUser(u);
+        client.startInteractive();
     }
 
     private void make(PrintStream t)throws AWTException{
@@ -73,7 +92,11 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
             if(T!=0)
                 outL.println("[WAIT "+(T*100)+"]");
             outL.println(s);
+            if(client!=null)
+                client.write(s);
+            //System.out.println(s);
         } 
+        
         T=0;        
     }
     public void waiting(){
@@ -126,18 +149,21 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {       
-       if(key(e.getExtendedKeyCode()).contains("F12")){
-             rec=!rec; 
-             R.setVisible(rec);
-             return;
-       }else if(key(e.getExtendedKeyCode()).contains("scap")){
-             rec=false; 
-             setVisible(false);
-             return;
-       }       
-       
-       println("[/"+key(e.getExtendedKeyCode())+"]");
+    public void keyReleased(KeyEvent e) {    
+        String key =  key(e.getExtendedKeyCode());
+        if(key.contains("F12")){
+            rec = !rec; 
+            R.setVisible(rec);
+            SwingUtilities.updateComponentTreeUI(this);
+        }else if(key.contains("sca")){
+            rec=false; 
+            R.setVisible(rec);
+
+            //setVisible(false);             
+            //println("EXIT");
+        }else{            
+            println("[/"+key+"]");
+        }
     } 
 
     private String key(Integer k){

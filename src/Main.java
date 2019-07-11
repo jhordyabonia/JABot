@@ -34,7 +34,7 @@ public class Main{
             }
         });
     }
-    private static void  interactive(Bot bot) throws IOException{
+    private static void interactive(Bot bot) throws IOException{
         Scanner teclado = new Scanner(System.in);
         String cadena;
         do
@@ -45,20 +45,10 @@ public class Main{
         }while(!cadena.equals("EXIT"));
     }
     private static void phanton(Bot bot,String host){
-
-        UserConnection u = new UserConnection() {            
-            public void write(String data){}
-            public void start(Connection c){
-                try{
-                    PrintStream print = new PrintStream(c.getOutputStream(),true);                        
-                    Phanton p = new Phanton(print);
-                    p.setVisible(true);
-                }catch(Exception e){}
-            }
-        };
-        Client c = new Client(host);            
-        c.setUser(u);
-        c.init();
+        try{
+            Phanton p = new Phanton();
+            p.connect(host);
+        }catch(AWTException e){}
     }
     private static void server(Bot bot){
         UserConnection u = new UserConnection() {            
@@ -96,7 +86,6 @@ public class Main{
         else if(args[0].startsWith("-c"))
             client(args.length>1?args[1]:"localhost");
         else if(args[0].startsWith("-p"))  
-            phanton(bot,args.length>1?args[1]:"localhost");
-        
+            phanton(bot,args.length>1?args[1]:"localhost");        
     }
 }

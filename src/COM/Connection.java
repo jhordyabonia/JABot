@@ -10,15 +10,18 @@ import java.util.Scanner;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.ArrayList;
 /**
  *
  * @author jhord_000
  */
 public abstract class Connection implements Runnable
 {     
+    private ArrayList<String> buffer = new ArrayList();
     public static int PORT = 5000;
     public static int DELAY = 100; 
+    private boolean ACTIVE = false;
+    protected boolean STOP = false;
     protected Thread runner = new Thread(this);
     protected DataOutputStream out;
     protected DataInputStream in;
@@ -58,23 +61,25 @@ public abstract class Connection implements Runnable
     @Override
     public final void run() 
     {
+        ACTIVE = true;
+        consumeBuffer();
+        int ERRORS = 0;
         String r="";
-        do
+        try 
         {
-            try 
-            {
-                do{
-                    Thread.sleep(DELAY);
-                    r =  in.readUTF();
-                    if(user != null){
-                        user.write(r);
-                    }
-                } while(r.isEmpty());
-            } catch (IOException | InterruptedException ex) {                
-                System.out.println("There were errors! "+ex.getMessage());
-            }
-            System.out.println("user: "+r);
-        }while(!r.equals("EXIT"));
+            do{
+                Thread.sleep(DELAY);
+                r =  in.readUTF();
+                System.out.println("\n> "+r);
+                if(user != null){
+                    user.write(r);
+                }
+            }while(!r.toUpperCase().equals("EXIT"));
+        } catch (IOException | InterruptedException ex) {
+            System.out.println("There were errors! "+ex.getMessage());
+        }
+        System.out.println("Conection finished");
+        close();
     }
     
     public final void acepted() throws IOException{
@@ -91,17 +96,38 @@ public abstract class Connection implements Runnable
         }
     }
     
-    public final void close(){
-        try {so.close();} 
-        catch (IOException ex) {/*println();*/}
+    public void close(){
+        try {
+            so.close();
+            in.close();
+            out.close();
+            _in.close();
+            _out.close();
+            System.exit(0);            
+        }catch (IOException ex) {}
     }
 
+    private void consumeBuffer(){
+        for (String s : buffer) {
+            write(s);
+        }
+    }
     public final void write(String s){
-        try {out.writeUTF(s);}
-        catch (IOException ex) {}
+        if(!ACTIVE){
+            buffer.add(s);
+            return;
+        }
+        STOP = s.toUpperCase().equals("EXIT");
+        try {
+            out.writeUTF(s);
+            if(STOP){
+                close();
+                System.out.println("Conection finished");
+            }
+        }catch (IOException ex) {}
     }
 
-    public final void startInteractive(){
+    public void startInteractive(){
         init();       
         Scanner teclado = new Scanner(System.in);
         String cadena;
@@ -109,7 +135,7 @@ public abstract class Connection implements Runnable
             System.out.print(">"); 
             cadena = teclado.nextLine();
             write(cadena);
-        }while(!cadena.startsWith("EXIT"));
+        }while(!STOP);
     }
     
 }
