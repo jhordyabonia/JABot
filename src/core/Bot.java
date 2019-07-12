@@ -14,10 +14,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.AWTException; 
+import java.util.ArrayList;
+
+import core.Var.VAR_TYPE;
 
 
 public class Bot extends Robot 
-{
+{       
+        public static final  ArrayList<Var> VARS = new ArrayList();
         public static final String JABOT_VERSION = "JABot 1.6";
         private String[] dictionary;
         private boolean in_catch=false;
@@ -295,7 +299,7 @@ public class Bot extends Robot
         {
             if(key==-1)return false;
             try{
-            this.keyPress(get_key(key));
+                this.keyPress(get_key(key));
             }catch(Exception e)
             {/*System.out.
                     println("get_key(key) > "
@@ -303,7 +307,6 @@ public class Bot extends Robot
             }
             return true;
         }        
-       
         private int get_key(String key) throws IOException
         {
             int out=-1;
@@ -365,10 +368,10 @@ public class Bot extends Robot
             text=text.toUpperCase();
             for(int c=0;c<text.length();c++)
             {
-                    this.delay(t);
-                    int tt=get_key(""+text.charAt(c));
-                    pressKey(tt);
-                    releaseKey(tt);
+                this.delay(t);
+                int tt=get_key(""+text.charAt(c));
+                pressKey(tt);
+                releaseKey(tt);
             }
             return true;
         }
@@ -379,11 +382,10 @@ public class Bot extends Robot
             if(file==null)
                 file="default.do";
             FileReader f= new FileReader(file);
-             BufferedReader b=new BufferedReader(f);
-             String c = "",out="";
-             if(block==null)
-             {
-                String before="";int line=0; 
+            BufferedReader b=new BufferedReader(f);
+            String c = "",out="", before="";
+            int line=0; 
+            if(block==null){
                 do{      
                     try {c=b.readLine(); } catch (IOException ex) 
                     {System.out.println("Err at time readig the File\nLine: "+line+"\nLast line Ok: "+before);}
@@ -391,13 +393,9 @@ public class Bot extends Robot
                     else out+=c;
                     before=c;
                 }while(c!=null);
-             }else 
-             {
+            }else{
                boolean active=false;
-               
-               String before="";int line=0; 
-               do
-               {      
+               do{      
                    try {  c=b.readLine(); } catch (IOException ex) 
                    {System.out.println("Err at time readig the File\nLine: "+line+"\nLast line Ok: "+before);}
                     
@@ -411,8 +409,9 @@ public class Bot extends Robot
                     before=c;
                 }while(true);
              }
-            try {f.close();} catch (IOException ex) {}
-             return out;
+            try {f.close();}
+            catch (IOException ex) {}
+            return out;
         }
         public void click(int btn,int x)
         {
@@ -491,8 +490,11 @@ public class Bot extends Robot
                         catched="";
                     }
                     else{ catched+=","+to_do; }              
-                } 
-                else if(to_do.startsWith("<"))
+                }else if(to_do.startsWith("[VAR ")){
+                    var(to_do.replace("[VAR ","").replace("]",""));
+                }else if(to_do.startsWith("[CALCULATE ")){
+                    calcula(to_do.replace("[CALCULATE ","").replace("]",""));
+                }else if(to_do.startsWith("<"))
                 {      continue;         }   
                 else if(to_do.startsWith("::DESCRIP"))
                 {   in_catch=true;       } 
@@ -541,6 +543,51 @@ public class Bot extends Robot
                     else type(type[0]); 
                 }
             }
+        }
+        public void calcula(String in){            
+            String data[] = in.split(" ");
+            char op = data[1].charAt(0);
+            Var a = VARS.get(pos_var(data[2]));
+            Var b = VARS.get(pos_var(data[3]));
+            Var result = Var.calcula(a, b, op);
+            result.name= data[0];
+            int pos = 0;
+            for(Var var : VARS) {
+                pos++;
+                if(var.name.equals(data[0]))
+                    break;
+            }
+            VARS.add(pos,result);
+        }
+        public void var(String in){
+            if(in.isEmpty()){
+                System.out.println("VARS:")                    ;
+                for (Var var : VARS) {
+                    System.out.println(var.name+" "+var.value)                    ;
+                }
+                return;
+            }
+            String data[] =in.split(" ");
+            int pos=pos_var(data[0]);
+            if(data.length<2&&pos!=-1){
+                System.out.println(VARS.get(pos).value);
+                return;
+            }
+            if(pos==-1){
+                VARS.add(new Var(data[0],VAR_TYPE.valueOf(data[1].toLowerCase()),data[2]));
+            }else{
+                Var tmp = VARS.get(pos);
+                tmp.value = data[2];
+            }
+        }
+        private int pos_var(String name){
+            int out = -1;
+            for(Var var : VARS) {
+                out++;
+                if(var.name.equals(name))
+                    return out;
+            }
+            return -1;
         }
         public void make(String name,String param) 
         {      
