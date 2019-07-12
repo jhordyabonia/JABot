@@ -33,6 +33,7 @@ import javax.swing.JLabel;
  */
 public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener 
 {
+    private int MOUSE_TOLERANCE = 2, MOUSE_X = -1, MOUSE_Y = -1;
     private Client client = null;
     private PrintStream outL;
     private static long T=1;
@@ -107,7 +108,10 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
         TIME = now; 
     }
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {        
+        MOUSE_X=e.getXOnScreen();
+        MOUSE_Y=e.getYOnScreen();
+    }
     @Override
     public void mousePressed(MouseEvent e){
         println("[MOUSE "+btn(e.getButton())+" 0]"); 
@@ -137,6 +141,12 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
     public void mouseMoved(MouseEvent e){
         Integer x=e.getXOnScreen();
         Integer y=e.getYOnScreen();
+        if((MOUSE_X+MOUSE_TOLERANCE)<x)return;
+        if((MOUSE_X-MOUSE_TOLERANCE)>x)return;
+        if((MOUSE_Y+MOUSE_TOLERANCE)<y)return;
+        if((MOUSE_Y-MOUSE_TOLERANCE)>y)return;
+        MOUSE_X = x;
+        MOUSE_Y = y;
         println("[MOUSE M "+x+" "+y+"]"); 
     }           
 
