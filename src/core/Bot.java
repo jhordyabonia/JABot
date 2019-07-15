@@ -508,25 +508,26 @@ public class Bot extends Robot
                             Do_(Tag.IF.catched);
                             Tag.IF.catched = "";
                         }else{                     
-                            Tag.ELSE.args = "true";
+                            Tag.ELSE.in_catch = true;
                         }   
                         Tag.ELSE.catched = "";
                     }else if(Tag.IF.ends(to_do)){    
                         Tag.IF.in_catch=false;  
-                        if(Tag.ELSE.args.equals("true")){
-                            Do_(Tag.ELSE.catched);                  
-                        }else if(condition){
+                        Tag.ELSE.in_catch=false;
+                        if(condition){
                            Do_(Tag.IF.catched);
+                        }else {
+                            Do_(Tag.ELSE.catched); 
                         }
                         Tag.IF.catched = "";
                         Tag.ELSE.catched = "";
                         Tag.IF.args = "";
                         Tag.ELSE.args = "";
                     }else{                        
-                        if(Tag.ELSE.args.equals("true")){
-                            Tag.IF.catched+=","+to_do;
+                        if(Tag.ELSE.in_catch){
+                            Tag.ELSE.catched+=","+to_do;
                         }else{
-                          Tag.ELSE.catched+=","+to_do;
+                          Tag.IF.catched+=","+to_do;
                         }
                     }
                     continue;
