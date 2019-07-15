@@ -15,9 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.AWTException; 
 import java.util.ArrayList;
-
 import core.Var.VAR_TYPE;
-
 
 public class Bot extends Robot 
 {       
@@ -28,7 +26,6 @@ public class Bot extends Robot
         private static boolean pause=false;
         private static boolean stop=false;
         private String catched="";
-        private int repeat;
         public static int DELAY=0;
         public static char MODE='d';
         private final Clipboard io = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -426,11 +423,19 @@ public class Bot extends Robot
             to_do=to_do.replace("[MOUSE ","").replace("]", "");
             String []data=to_do.split(" ");
             int y=-1,x=-1; char c='L';
-            if(data.length>2)
-                y=Integer.parseInt(data[2]);
-            if(data.length>1)
-                x=Integer.parseInt(data[1]);
-            if(data[0]!=null)
+            if(data.length>2){
+                try{
+                    y=Integer.parseInt(var(data[2]));
+                }catch(NumberFormatException e){
+                    y=Integer.parseInt(data[2]);
+                }
+            }if(data.length>1){             
+                try{
+                    x=Integer.parseInt(var(data[1]));
+                }catch(NumberFormatException e){
+                    x=Integer.parseInt(data[1]);
+                }
+            }if(data[0]!=null)
                 c=data[0].charAt(0);
                         
             switch(c)
@@ -447,7 +452,7 @@ public class Bot extends Robot
                     else click(InputEvent.BUTTON2_DOWN_MASK,x);  
                     break;  
                 default: 
-                        mouseMove(x,y); 
+                    mouseMove(x,y); 
             }       
         }    
         public void Do_(String in) throws IOException 
@@ -470,141 +475,209 @@ public class Bot extends Robot
             {
                 path_fail+=">>"+to_do;
                 if(to_do==null)continue;
-                if(to_do.startsWith("[STOP"))
-                {return;}
-                else if(in_catch)
-                {    
-                    if(to_do.startsWith("::DESCRIP"))
-                    {   in_catch=false;      } 
-                    else if(to_do.contains("/REPEAT"))
-                    {    
-                        in_catch=false;
-                        for(int i=0;i<repeat;i++)
-                         Do_(catched);
-                        catched="";
-                    }else
-                    if(to_do.contains("/MAKE"))
-                    {
-                        in_catch=false;
-                        make(catched,to_do);
-                        catched="";
+                if(Tag.STOP.startsWith(to_do)){
+                    return;
+                }else if(Tag.MAKE.in_catch){
+                    if(Tag.MAKE.ends(to_do)){
+                        Tag.MAKE.in_catch=false;
+                        make(Tag.MAKE.catched,to_do);
+                        Tag.MAKE.catched="";
+                    }else{
+                        Tag.MAKE.catched+=","+to_do;
                     }
-                    else{ catched+=","+to_do; }              
-                }else if(to_do.startsWith("[VAR ")){
+                }else if(Tag.REPEAT.in_catch){
+                    if(Tag.REPEAT.ends(to_do)){    
+                        Tag.REPEAT.in_catch=false;
+                        String sent = Tag.REPEAT.args.replace("[REPEAT ","").replace("]", "");
+                        int repeat = 0;
+                        try{
+                            repeat=Integer.parseInt(var(sent));
+                        }catch(NumberFormatException e){
+                            repeat=Integer.parseInt(sent);                    
+                        } 
+                        for(int i=0;i<repeat;i++)
+                         Do_(Tag.REPEAT.catched);
+                        Tag.REPEAT.catched="";                            
+                    }else {
+                        Tag.REPEAT.catched+=","+to_do;
+                    }
+                }else if(Tag.IF.in_catch){
+                    boolean condition = var(Tag.IF.args.replace("[IF ","").replace("]", "")).equals("true");
+                    if(Tag.ELSE.startsWith(to_do)){                   
+                        if(condition){
+                            Do_(Tag.IF.catched);
+                            Tag.IF.catched = "";
+                        }else{                     
+                            Tag.ELSE.args = "true";
+                        }   
+                        Tag.ELSE.catched = "";
+                    }else if(Tag.IF.ends(to_do)){    
+                        Tag.IF.in_catch=false;  
+                        if(Tag.ELSE.args.equals("true")){
+                            Do_(Tag.ELSE.catched);                  
+                        }else if(condition){
+                           Do_(Tag.IF.catched);
+                        }
+                        Tag.IF.catched = "";
+                        Tag.ELSE.catched = "";
+                        Tag.IF.args = "";
+                        Tag.ELSE.args = "";
+                    }else{                        
+                        if(Tag.ELSE.args.equals("true")){
+                            Tag.IF.catched+=","+to_do;
+                        }else{
+                          Tag.ELSE.catched+=","+to_do;
+                        }
+                    }
+                    continue;
+                }else if(Tag.DESCRIP.in_catch){    
+                    if(Tag.DESCRIP.contains(to_do)){
+                        Tag.DESCRIP.in_catch=false;
+                    }else{
+                        Tag.DESCRIP.catched+=","+to_do;                        
+                    }              
+                }else if(Tag.VAR.startsWith(to_do)){
                     var(to_do.replace("[VAR ","").replace("]",""));
-                }else if(to_do.startsWith("[CALCULATE ")){
+                }else if(Tag.CALCULATE.startsWith(to_do)){
                     calcula(to_do.replace("[CALCULATE ","").replace("]",""));
-                }else if(to_do.startsWith("<"))
-                {      continue;         }   
-                else if(to_do.startsWith("::DESCRIP"))
-                {   in_catch=true;       } 
-                else if(to_do.startsWith("::"))
-                {      continue;         }   
-                else if(to_do.contains("[LOAD"))
-                {   load_dictinary(to_do.replace("[LOAD ","").replace("]", ""));  }
-                else if(to_do.contains("[REPEAT"))
-                {     
-                    repeat=Integer.parseInt(to_do.replace("[REPEAT ","").replace("]", ""));
-                    in_catch=true;                 
-                }
-                else if(to_do.contains("[MAKE"))
-                {                                     
-                    catched=to_do.replace("[MAKE ","").replace("]", "");
-                    in_catch=true;
-                }else if(to_do.contains("NOW"))
-                {  run(to_do); }
-                else if(to_do.contains("MOUSE"))
-                {  mouse_do(to_do);
-                }else if(to_do.contains("[IF "))
-                {                if_(to_do);
-                }else if(to_do.contains("WAIT"))
-                {                
+                }else if(to_do.startsWith("<")){
+                    continue;
+                }else if(Tag.DESCRIP.contains(to_do)){
+                    Tag.DESCRIP.in_catch=true;
+                }else if(to_do.startsWith("::")){
+                    continue;
+                }else if(Tag.LOAD.startsWith(to_do)){
+                    load_dictinary(to_do.replace("[LOAD ","").replace("]", ""));  
+                }else if(Tag.REPEAT.startsWith(to_do)){    
+                    Tag.REPEAT.args = to_do;                    
+                    Tag.REPEAT.in_catch=true;                 
+                }else if(Tag.MAKE.startsWith(to_do)){                                     
+                    Tag.MAKE.args=to_do;
+                    Tag.MAKE.in_catch=true;
+                }else if(Tag.NOW.startsWith(to_do)){
+                    run(to_do); 
+                }else if(Tag.MOUSE.startsWith(to_do)){
+                    mouse_do(to_do);
+                }else if(Tag.IF.startsWith(to_do)){
+                    Tag.IF.args = to_do;
+                    Tag.IF.in_catch=true;
+                }else if(Tag.WAIT.startsWith(to_do)){                
                     to_do=to_do.replace("[WAIT ","").replace("]", "");
-                    this.delay(Integer.parseInt(to_do));
-                }else if(to_do.endsWith("/]"))
-                {
+                    try{
+                        this.delay(Integer.parseInt(var(to_do)));
+                    }catch(NumberFormatException e){
+                        this.delay(Integer.parseInt(to_do));
+                    }
+                }else if(to_do.endsWith("/]")){
                     to_do=to_do.replace("[","").replace("/]", "");
                     pressKey(get_key(to_do));
                     releaseKey(get_key(to_do));
-                }else if(to_do.startsWith("[/"))
-                {
+                }else if(to_do.startsWith("[/")){
                     to_do=to_do.replace("[/","").replace("]", "");
                     releaseKey(get_key(to_do));
-                }else if(to_do.startsWith("["))
-                {            
+                }else if(to_do.startsWith("[")){            
                     to_do=to_do.replace("[","").replace("]", "");
                     pressKey(get_key(to_do));
-                }else
-                {
+                }else{
                     String []type =to_do.split("::");
 
-                    if(type.length>1)
-                        type(type[0],Integer.parseInt(type[1]));
-                    else type(type[0]); 
+                    if(type.length>1){
+                        try{
+                            type(type[0],Integer.parseInt(var(type[1])));
+                        }catch(NumberFormatException e){
+                            type(type[0],Integer.parseInt(type[1]));                    
+                        } 
+                    }else type(type[0]); 
                 }
             }
         }
-        public void calcula(String in){            
+        public String  calcula(String in){ 
             String data[] = in.split(" ");
             char op = data[1].charAt(0);
             Var a = VARS.get(pos_var(data[2]));
-            Var b = VARS.get(pos_var(data[3]));
+            Var b = data.length>3?VARS.get(pos_var(data[3])):new Var("", VAR_TYPE.number);
             Var result = Var.calcula(a, b, op);
-            result.name= data[0];
-            int pos = 0;
-            for(Var var : VARS) {
-                pos++;
-                if(var.name.equals(data[0]))
-                    break;
+            if(!data[0].equals("="))
+                result.name = data[0];
+            int pos = pos_var(result.name);
+            
+            if(pos!=-1){
+                Var tmp = VARS.get(pos);
+                tmp.value = result.value;
+                tmp.type = result.type;
+            }else{
+                VARS.add(result);
             }
-            VARS.add(pos,result);
+            return result.value;
         }
-        public void var(String in){
-            if(in.isEmpty()){
+        public String var(String in){  
+             if(in.isEmpty()){
+                int count = 0;
+                String out = "";
                 System.out.println("VARS:")                    ;
                 for (Var var : VARS) {
-                    System.out.println(var.name+" "+var.value)                    ;
+                    count++;
+                    out += ","+var.value;
+                    if(Bot.MODE=='i')
+                        System.out.println(var.name+"\t"+var.value)                    ;
                 }
-                return;
+                return count+out;
             }
-            String data[] =in.split(" ");
-            int pos=pos_var(data[0]);
+            String data[] = in.split(" ");            
+           
+            String name =  data[0].toUpperCase();
+            int pos = pos_var(name);
             if(data.length<2&&pos!=-1){
-                System.out.println(VARS.get(pos).value);
-                return;
+                if(Bot.MODE=='i')
+                    System.out.println(VARS.get(pos).value);
+                return VARS.get(pos).value.toLowerCase();
             }
-            if(pos==-1){
-                VARS.add(new Var(data[0],VAR_TYPE.valueOf(data[1].toLowerCase()),data[2]));
-            }else{
+            if(data.length<2)
+                return "";
+            
+            String type = data[1].toLowerCase();
+            data[0]=data[1]="";
+            String value = String.join(" ",data).trim().toLowerCase();                
+            
+            if(pos!=-1){
                 Var tmp = VARS.get(pos);
-                tmp.value = data[2];
+                tmp.value = value;
+                tmp.type = VAR_TYPE.valueOf(type);
+            }else{
+                VARS.add(new Var(name,VAR_TYPE.valueOf(type),value));
             }
+            return null;
         }
         private int pos_var(String name){
-            int out = -1;
-            for(Var var : VARS) {
-                out++;
-                if(var.name.equals(name))
+            for(int out = 0; out<VARS.size();out++) {
+                Var var = VARS.get(out);
+                 if(var.name.toUpperCase().trim().equals(name.toUpperCase().trim()))
                     return out;
             }
             return -1;
         }
-        public void make(String name,String param) 
-        {      
+        public void make(String data_in,String param) 
+        {   
             boolean append=param.contains("+");
              
-             String[] data=name.split(",");
-             name=data[0];
-             
-             FileWriter f=null;
-            try {f = new FileWriter(name);} catch (IOException ex) 
-            {System.out.println("Err: Command no made");}
-             for(int i=1;i<data.length;i++)
-                try {
+            String[] data=data_in.split(",");
+
+            String name = Tag.MAKE.args.replace("[MAKE ","").replace("]", "");
+            String _name = var(name);
+            if(!_name.isEmpty()&&!_name.contains(","))
+               name = _name;
+
+            System.out.println("name: "+name);
+            System.out.println(String.join(",",data));
+            FileWriter f=null;
+            try {
+                f = new FileWriter(name);
+                for(int i=1;i<data.length;i++) {
                     f.write(data[i]+'\n');            
                     f.close();
-                } catch (IOException ex)
-                {System.out.println("Err: Writing commad no made");}
+                }
+            } catch (IOException ex) 
+            {System.out.println("Err: Command no made");}
         }                
         private void run(String in)
         {   
@@ -643,8 +716,6 @@ public class Bot extends Robot
             } catch (IOException ex) { }     
             
         }        
-        public void if_(String to_do){
-            System.out.println(to_do);
-        }
+       
 	
 } 

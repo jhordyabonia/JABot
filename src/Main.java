@@ -73,19 +73,27 @@ public class Main{
             graphicMode();
         else if(args[0].startsWith("-h"))
             System.out.println(help());
-        else if(args[0].startsWith("-d"))
+        else if(args[0].startsWith("-d")){
+            Bot.MODE = 'd';
             bot.Do(args.length>1?args[1]:null,args.length>2?args[2]:null);
-        else if(args[0].startsWith("-r"))
+        }else if(args[0].startsWith("-r")){
+            Bot.MODE = 'r';
             bot.Do_(args[1]);
-        else if(args[0].startsWith("-i"))
+        }else if(args[0].startsWith("-i")){
+            Bot.MODE = 'i';
             interactive(bot);
-        else if(args[0].startsWith("-g"))
+        }else if(args[0].startsWith("-g")){
+            Bot.MODE = 'g';
             graphicMode();
-        else if(args[0].startsWith("-s"))
+        }else if(args[0].startsWith("-s")){
+            Bot.MODE = 's';
             server(bot);
-        else if(args[0].startsWith("-c"))
+        }else if(args[0].startsWith("-c")){
+            Bot.MODE = 'c';
             client(args.length>1?args[1]:"localhost");
-        else if(args[0].startsWith("-p"))  
-            phanton(bot,args.length>1?args[1]:"localhost");        
+        }else if(args[0].startsWith("-p")){
+            Bot.MODE = 'p';
+            phanton(bot,args.length>1?args[1]:"localhost");     
+        }   
     }
 }
