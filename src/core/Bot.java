@@ -25,6 +25,7 @@ public class Bot extends Robot
         private boolean in_catch=false;
         private static boolean pause=false;
         private static boolean stop=false;
+        public static boolean LOG=false;
         private String catched="";
         public static int DELAY=0;
         public static char MODE='d';
@@ -456,11 +457,13 @@ public class Bot extends Robot
             }       
         }    
         public void Do_(String in) throws IOException 
-        {          
-            path_fail+="\n#"+step++;
-            for(int u=step;u>=0;u--)
-                path_fail+=" ";
-            path_fail+="-";
+        {        
+            if(LOG){  
+                path_fail+="\n#"+step++;
+                for(int u=step;u>=0;u--)
+                    path_fail+=" ";
+                path_fail+="-";
+            }
             
             while(pause)
              try {Thread.sleep(100);if(stop)System.exit(0);} 
@@ -473,7 +476,8 @@ public class Bot extends Robot
             
             for(String to_do:in.split(","))
             {
-                path_fail+=">>"+to_do;
+                if(LOG)
+                    path_fail+=">>"+to_do;
                 if(to_do==null)continue;
                 if(Tag.STOP.startsWith(to_do)){
                     return;
@@ -502,30 +506,26 @@ public class Bot extends Robot
                         Tag.REPEAT.catched+=","+to_do;
                     }
                 }else if(Tag.IF.in_catch){
-                    boolean condition = var(Tag.IF.args.replace("[IF ","").replace("]", "")).equals("true");
-                    if(Tag.ELSE.startsWith(to_do)){                   
-                        if(condition){
-                            Do_(Tag.IF.catched);
-                            Tag.IF.catched = "";
-                        }else{                     
-                            Tag.ELSE.in_catch = true;
-                        }   
+                    if(Tag.ELSE.startsWith(to_do)){ 
+                        Tag.ELSE.in_catch = !var(Tag.IF.args).equals("true"); ;
                         Tag.ELSE.catched = "";
-                    }else if(Tag.IF.ends(to_do)){    
+                    }else if(Tag.IF.ends(to_do)){  
+                        String catched = null;
+                        if(var(Tag.IF.args).equals("true")){
+                            catched = Tag.IF.catched;
+                        }else if(Tag.ELSE.in_catch){
+                            catched = Tag.ELSE.catched; 
+                        }
                         Tag.IF.in_catch=false;  
                         Tag.ELSE.in_catch=false;
-                        if(condition){
-                           Do_(Tag.IF.catched);
-                        }else {
-                            Do_(Tag.ELSE.catched); 
-                        }
                         Tag.IF.catched = "";
                         Tag.ELSE.catched = "";
                         Tag.IF.args = "";
                         Tag.ELSE.args = "";
+                        Do_(catched);
                     }else{                        
                         if(Tag.ELSE.in_catch){
-                            Tag.ELSE.catched+=","+to_do;
+                          Tag.ELSE.catched+=","+to_do;
                         }else{
                           Tag.IF.catched+=","+to_do;
                         }
@@ -538,7 +538,7 @@ public class Bot extends Robot
                         Tag.DESCRIP.catched+=","+to_do;                        
                     }              
                 }else if(Tag.VAR.startsWith(to_do)){
-                    var(to_do.replace("[VAR ","").replace("]",""));
+                    var(to_do.replace("[VAR ","").replace("]",""),true);
                 }else if(Tag.CALCULATE.startsWith(to_do)){
                     calcula(to_do.replace("[CALCULATE ","").replace("]",""));
                 }else if(to_do.startsWith("<")){
@@ -560,8 +560,8 @@ public class Bot extends Robot
                 }else if(Tag.MOUSE.startsWith(to_do)){
                     mouse_do(to_do);
                 }else if(Tag.IF.startsWith(to_do)){
-                    Tag.IF.args = to_do;
-                    Tag.IF.in_catch=true;
+                    Tag.IF.args = to_do.replace("[IF ","").replace("]", "");
+                    Tag.IF.in_catch = true;
                 }else if(Tag.WAIT.startsWith(to_do)){                
                     to_do=to_do.replace("[WAIT ","").replace("]", "");
                     try{
@@ -611,7 +611,10 @@ public class Bot extends Robot
             }
             return result.value;
         }
-        public String var(String in){  
+        public String var(String in){
+            return var(in,false);
+        }        
+        public String var(String in,boolean print){  
              if(in.isEmpty()){
                 int count = 0;
                 String out = "";
@@ -619,7 +622,7 @@ public class Bot extends Robot
                 for (Var var : VARS) {
                     count++;
                     out += ","+var.value;
-                    if(Bot.MODE=='i')
+                    if(Bot.MODE=='i'&&print)
                         System.out.println(var.name+"\t"+var.value)                    ;
                 }
                 return count+out;
@@ -669,10 +672,9 @@ public class Bot extends Robot
                name = _name;
 
             System.out.println("name: "+name);
-            System.out.println(String.join(",",data));
-            FileWriter f=null;
+            System.out.println("#::,"+String.join(",",data).replace("#::,,",""));
             try {
-                f = new FileWriter(name);
+                FileWriter f = new FileWriter(name);
                 for(int i=1;i<data.length;i++) {
                     f.write(data[i]+'\n');            
                     f.close();
