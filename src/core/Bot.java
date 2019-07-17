@@ -421,7 +421,7 @@ public class Bot extends Robot
         }
         public void mouse_do(String to_do)
         {
-            to_do=to_do.replace("[MOUSE ","").replace("]", "");
+            to_do=to_do.toUpperCase().replace("[MOUSE ","").replace("]", "");
             String []data=to_do.split(" ");
             int y=-1,x=-1; char c='L';
             if(data.length>2){
@@ -466,13 +466,17 @@ public class Bot extends Robot
             }
             
             while(pause)
-             try {Thread.sleep(100);if(stop)System.exit(0);} 
-             catch (InterruptedException ex) {}
+             try {
+                 if(DELAY!=0)
+                   Thread.sleep(DELAY);
+                 if(stop)System.exit(0);
+             }catch (InterruptedException ex) {}
             if(in==null)return;
             
-            do
-                in=in.replace("  ", " ");
-            while(in.contains("  "));
+            in=in.trim();
+            if(in.toLowerCase().contains(Tag.VAR.tag+"::")){
+                in=get_var(in);
+            }
             
             for(String to_do:in.split(","))
             {
@@ -492,7 +496,7 @@ public class Bot extends Robot
                 }else if(Tag.REPEAT.in_catch){
                     if(Tag.REPEAT.ends(to_do)){    
                         Tag.REPEAT.in_catch=false;
-                        String sent = Tag.REPEAT.args.replace("[REPEAT ","").replace("]", "");
+                        String sent = Tag.REPEAT.args;
                         int repeat = 0;
                         try{
                             repeat=Integer.parseInt(var(sent));
@@ -538,9 +542,9 @@ public class Bot extends Robot
                         Tag.DESCRIP.catched+=","+to_do;                        
                     }              
                 }else if(Tag.VAR.startsWith(to_do)){
-                    var(to_do.replace("[VAR ","").replace("]",""),true);
+                    var(to_do.toUpperCase().replace("[VAR ","").replace("]",""),true);
                 }else if(Tag.CALCULATE.startsWith(to_do)){
-                    calcula(to_do.replace("[CALCULATE ","").replace("]",""));
+                    calcula(to_do.toUpperCase().replace("[CALCULATE ","").replace("]",""));
                 }else if(to_do.startsWith("<")){
                     continue;
                 }else if(Tag.DESCRIP.contains(to_do)){
@@ -548,9 +552,9 @@ public class Bot extends Robot
                 }else if(to_do.startsWith("::")){
                     continue;
                 }else if(Tag.LOAD.startsWith(to_do)){
-                    load_dictinary(to_do.replace("[LOAD ","").replace("]", ""));  
+                    load_dictinary(to_do.toUpperCase().replace("[LOAD ","").replace("]", ""));  
                 }else if(Tag.REPEAT.startsWith(to_do)){    
-                    Tag.REPEAT.args = to_do;                    
+                    Tag.REPEAT.args = to_do.toUpperCase().replace("[REPEAT ","").replace("]", "");                    
                     Tag.REPEAT.in_catch=true;                 
                 }else if(Tag.MAKE.startsWith(to_do)){                                     
                     Tag.MAKE.args=to_do;
@@ -560,10 +564,10 @@ public class Bot extends Robot
                 }else if(Tag.MOUSE.startsWith(to_do)){
                     mouse_do(to_do);
                 }else if(Tag.IF.startsWith(to_do)){
-                    Tag.IF.args = to_do.replace("[IF ","").replace("]", "");
+                    Tag.IF.args = to_do.toUpperCase().replace("[IF ","").replace("]", "");
                     Tag.IF.in_catch = true;
                 }else if(Tag.WAIT.startsWith(to_do)){                
-                    to_do=to_do.replace("[WAIT ","").replace("]", "");
+                    to_do=to_do.toUpperCase().replace("[WAIT ","").replace("]", "");
                     try{
                         this.delay(Integer.parseInt(var(to_do)));
                     }catch(NumberFormatException e){
@@ -641,16 +645,19 @@ public class Bot extends Robot
             
             String type = data[1].toLowerCase();
             data[0]=data[1]="";
-            String value = String.join(" ",data).trim().toLowerCase();                
+            String value = String.join(" ",data).trim();               
             
+            String v = var(value);
+            value = !v.isEmpty()?v:value;
             if(pos!=-1){
                 Var tmp = VARS.get(pos);
+                //value = get_var(value);
                 tmp.value = value;
                 tmp.type = VAR_TYPE.valueOf(type);
-            }else{
+            }else{                
                 VARS.add(new Var(name,VAR_TYPE.valueOf(type),value));
             }
-            return null;
+            return "";
         }
         private int pos_var(String name){
             for(int out = 0; out<VARS.size();out++) {
@@ -662,26 +669,48 @@ public class Bot extends Robot
         }
         public void make(String data_in,String param) 
         {   
-            boolean append=param.contains("+");
+            //boolean append=param.contains("+");
              
             String[] data=data_in.split(",");
 
-            String name = Tag.MAKE.args.replace("[MAKE ","").replace("]", "");
+            String name = Tag.MAKE.args.replace("[MAKE ","").replace("[make ","").replace("]", "");
+
             String _name = var(name);
             if(!_name.isEmpty()&&!_name.contains(","))
                name = _name;
 
             System.out.println("name: "+name);
-            System.out.println("#::,"+String.join(",",data).replace("#::,,",""));
+            System.out.println(String.join(",",data).substring(0));
             try {
                 FileWriter f = new FileWriter(name);
-                for(int i=1;i<data.length;i++) {
-                    f.write(data[i]+'\n');            
-                    f.close();
+                for(int i=0;i<data.length;i++) {
+                    if(data[i].toLowerCase().contains(Tag.VAR.tag+"::")){
+                        data[i]=get_var(data[i]);
+                    }
+                    f.write(data[i].trim()+'\n');
                 }
+                f.close();
             } catch (IOException ex) 
             {System.out.println("Err: Command no made");}
-        }                
+        } 
+        private String get_var(String data){
+            String n ="";
+            for(String v:data.replace("]", "").split(" ")){
+                if(v.startsWith(Tag.VAR.tag+"::")){
+                    n=v.replace(Tag.VAR.tag+"::", "");
+                    break;
+                }else if(v.startsWith(Tag.VAR.tag.toUpperCase()+"::")){
+                    n=v.replace(Tag.VAR.tag.toUpperCase()+"::", "");
+                    break;
+                }
+            }
+            String var = var(n);
+            if(!var.isEmpty()){
+                data=data.replace(Tag.VAR.tag.toUpperCase()+"::"+n, var);
+                data=data.replace(Tag.VAR.tag+"::"+n, var);
+            }
+            return data;
+        }
         private void run(String in)
         {   
             Transferable t = io.getContents(this);

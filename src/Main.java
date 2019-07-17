@@ -15,15 +15,16 @@ public class Main{
     public static int error = 0;
     public static String[] HELP ={
         "",Bot.JABOT_VERSION,"",
-        "-h \tDisplay this help","",
-        " l \tActive Error Log ","\tUse   -?l <agrs> ","\tEx: -dl SYSTEM RUN ","",
-        "-d \tRun File or Block into File ","\tUse   -d <file> <block> ","\tEx: -d SYSTEM RUN ","",
-        "-r \tRun any cammand ","\tUse   -r COMMAND ","\tEx: -r [MOUSE M 0 0]","",
-        "-i \tRun interactive mode","\ttype any command one and other, and other... ","",
-        "-g \tRun graphic mode","",
-        "-s \tRun server mode","",
-        "-c \tRun client mode","\tUse -c <server>","\tEx: -c 192.168.0.18","",
-        "-p \tRun phanton mode","\tUse -p <server>","\tEx: -p 192.168.0.18","",
+        "h \tDisplay this help","",
+        "d \tRun File or Block into File ","\tUse  d <file> <block> ","\tEx: d SYSTEM RUN ","",
+        "r \tRun any cammand ","\tUse  r COMMAND ","\tEx: r [MOUSE M 0 0]","",
+        "i \tRun interactive mode","\ttype any command one and other, and other... ","",
+        "g \tRun graphic mode","",
+        "s \tRun server mode","",
+        "c \tRun client mode","\tUse c <server>","\tEx: c 192.168.0.18","",
+        "p \tRun phanton mode","\tUse p <server>","\tEx: p 192.168.0.18","",
+        "t \tSet delay between each action","\tUse ?t#### \tWhere # is integer 0-1","\tEx: st0 \tset delay 0","\tEx: st100 \tset delay 100","",
+        "l \tActive Error Log ","\tUse ?l <agrs> ","\tEx: dl SYSTEM RUN ","",        
         "",
         "",
         ""
@@ -46,7 +47,7 @@ public class Main{
         {
             System.out.print(">"); 
             cadena = teclado.nextLine();
-            bot.Do_(cadena.toUpperCase());
+            bot.Do_(cadena);
         }while(!cadena.toUpperCase().equals("EXIT"));
     }
     private static void phanton(Bot bot,String host){
@@ -73,45 +74,72 @@ public class Main{
     private static void client(String host){
         new Client(host).startInteractive();
     }
+    private static void setDelay(String args){
+        String num="";int error=0;
+        for(char c:args.toCharArray()){
+            try{
+                Integer.parseInt(""+c);
+                num += c;
+                error = 1;
+            }catch(NumberFormatException e){
+                error= error+error;
+                if(error>0)
+                    break;
+            }
+        }
+        try{
+            Bot.DELAY= Integer.parseInt(num);
+        }catch(NumberFormatException e){}
+    }
     public static void main(String[] args) 
     { 
         try{
             final Bot bot = new Bot();
             bot.load_dictinary(null);
-            if(args[0].contains("l"))
-                Bot.LOG=true;
-            if(args.length<1)
+            if(args.length<1){
                 graphicMode();
-            else if(args[0].startsWith("-h"))
+                return;
+            }
+            
+            if(args[0].contains("l")){
+                Bot.LOG=true;
+            }
+            if(args[0].contains("t")){
+               setDelay(args[0]);
+            }
+            
+            if(args[0].contains("h"))
                 System.out.println(help());
-            else if(args[0].startsWith("-d")){
+            else if(args[0].contains("d")){
                 Bot.MODE = 'd';
                 bot.Do(args.length>1?args[1]:null,args.length>2?args[2]:null);
-            }else if(args[0].startsWith("-r")){
+            }else if(args[0].contains("r")){
                 Bot.MODE = 'r';
                 bot.Do_(args[1]);
-            }else if(args[0].startsWith("-i")){
+            }else if(args[0].contains("i")){
                 Bot.MODE = 'i';
                 interactive(bot);
-            }else if(args[0].startsWith("-g")){
+            }else if(args[0].contains("g")){
                 Bot.MODE = 'g';
                 graphicMode();
-            }else if(args[0].startsWith("-s")){
+            }else if(args[0].startsWith("s")){
                 Bot.MODE = 's';
                 server(bot);
-            }else if(args[0].startsWith("-c")){
+            }else if(args[0].contains("c")){
                 Bot.MODE = 'c';
                 client(args.length>1?args[1]:"localhost");
-            }else if(args[0].startsWith("-p")){
+            }else if(args[0].contains("p")){
                 Bot.MODE = 'p';
                 phanton(bot,args.length>1?args[1]:"localhost");     
             }  
         }catch(Exception e){
             System.err.println(e.getMessage());
             System.out.println(error+")Bot Error:\n"+Bot.getLog());
-            System.out.println("Faltal error\nReloading...");
-            if(error++<3&run)
+            System.out.println("Faltal error");
+            if(error++<3&run){
+                System.out.println("Reloading...");
                 main(args);
+            }
         } 
     }
 }

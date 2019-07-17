@@ -1,20 +1,20 @@
 package core;
 public class Tag{
     private Tag(String name){
-        tag = name;
+        tag = name.toLowerCase();
     }
     String tag = "";
     String args = "";
     String catched = "";
     boolean in_catch = false;
     boolean startsWith(String in){
-        return in.startsWith("["+tag);
+        return in.toLowerCase().startsWith("["+tag);
     }
     boolean contains(String in){
-        return in.contains(tag);    
+        return in.toLowerCase().contains(tag);    
     }
     boolean ends(String in){        
-        return in.contains("/"+tag);
+        return in.toLowerCase().contains("/"+tag);
     }
     public static final Tag MAKE = new Tag("MAKE");
     public static final Tag REPEAT = new Tag("REPEAT");
