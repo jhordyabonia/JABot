@@ -82,6 +82,7 @@ public class Var{
                 else if(op=='+')_value = ""+ (Double.parseDouble(a.value) + Double.parseDouble(b.value));
                 else if(op=='*')_value = ""+ (Double.parseDouble(a.value) * Double.parseDouble(b.value));
                 else if(op=='/')_value = ""+ (Double.parseDouble(a.value) / Double.parseDouble(b.value));
+                else if(op=='^')_value = ""+ Math.sqrt(Double.parseDouble(a.value));
                 else {
                     _type = VAR_TYPE.bool;
                     if(op=='=')
@@ -98,10 +99,16 @@ public class Var{
                 else  _value = a.value.toUpperCase().equals(b.value.toUpperCase()) && a.value.equals("true")?a.value:"false";
                 return new Var(_name,a.type,_value);
             case string:
-               // if(op=='+')                    
+                if(op=='+')                    
                     _value = a.value + b.value;
-                //else if(op=='-')
-                //    _value = a.value + b.value;
+                else{ 
+                    int y = 0;
+                    try{
+                        y=Integer.parseInt(""+op);
+                        _value=a.value.split(" ")[y];
+                    }catch(NumberFormatException e){
+                    }
+                }
                 return new Var(_name,a.type,_value);
             case compose:
                 break;
