@@ -1,5 +1,7 @@
 package core;
- 
+
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
 import java.awt.Robot; 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.awt.AWTException; 
 import java.util.ArrayList;
 import core.Var.VAR_TYPE;
+import java.awt.Point;
 
 public class Bot extends Robot 
 {       
@@ -40,7 +43,12 @@ public class Bot extends Robot
         }        
     
         public Bot() throws AWTException
-        { super();step=0;}
+        { 
+            super();
+            step=0;
+            var("TIME number "+System.currentTimeMillis());
+            pos();
+        }
         public String[] get_dictionary()
         {
             return dictionary;
@@ -411,6 +419,12 @@ public class Bot extends Robot
             catch (IOException ex) {}
             return out;
         }
+        private void pos(){            
+            PointerInfo a = MouseInfo.getPointerInfo();
+            Point b = a.getLocation();            
+            var("MOUSEX number "+(int) b.getX());
+            var("MOUSEY number "+(int) b.getY());
+        }
         public void click(int btn,int x)
         {
              if(x==0)
@@ -421,6 +435,11 @@ public class Bot extends Robot
         }
         public void mouse_do(String to_do)
         {
+            pos();
+            PointerInfo a = MouseInfo.getPointerInfo();
+            Point b = a.getLocation();            
+            var("MOUSEX number "+(int) b.getX());
+            var("MOUSEY number "+(int) b.getY());
             to_do=to_do.toUpperCase().replace("[MOUSE ","").replace("]", "");
             String []data=to_do.split(" ");
             int y=-1,x=-1; char c='L';
@@ -458,6 +477,7 @@ public class Bot extends Robot
         }    
         public void Do_(String in) throws IOException 
         {        
+            var("TIME number "+System.currentTimeMillis());
             if(LOG){  
                 path_fail+="\n#"+step++;
                 for(int u=step;u>=0;u--)
