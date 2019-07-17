@@ -87,9 +87,9 @@ public class Var{
                     if(op=='=')
                       _value = (Double.parseDouble(a.value) == Double.parseDouble(b.value))?"true":"false";
                     else if(op=='>')
-                      _value = (Double.parseDouble(a.value) == Double.parseDouble(b.value))?"true":"false";
+                      _value = (Double.parseDouble(a.value) > Double.parseDouble(b.value))?"true":"false";
                     else if(op=='<')
-                      _value = (Double.parseDouble(a.value) == Double.parseDouble(b.value))?"true":"false";                 
+                      _value = (Double.parseDouble(a.value) < Double.parseDouble(b.value))?"true":"false";                 
                 }
                 return new Var(_name,_type,_value);
             case bool:
