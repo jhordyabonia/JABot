@@ -1,5 +1,5 @@
 ::VARS
-[VAR RULE1 number 10]
+[VAR RULE1 number 2]
 [VAR RULE2 number 1]
 [VAR RULES number 2]
 [CALCULATE RULE = RULE1 RULE2]

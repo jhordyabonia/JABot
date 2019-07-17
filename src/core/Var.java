@@ -102,9 +102,8 @@ public class Var{
                 if(op=='+')                    
                     _value = a.value + b.value;
                 else{ 
-                    int y = 0;
                     try{
-                        y=Integer.parseInt(""+op);
+                        int y=Integer.parseInt(""+op);
                         _value=a.value.split(" ")[y];
                     }catch(NumberFormatException e){
                     }
