@@ -3,17 +3,22 @@ public class Tag{
     private Tag(String name){
         tag = name.toLowerCase();
     }
-    String tag = "";
-    String args = "";
-    String catched = "";
-    boolean in_catch = false;
-    boolean startsWith(String in){
+    public final String tag;
+    public String args = "";
+    public String catched = "";
+    public boolean in_catch = false;
+    public boolean startsWith(String in){
         return in.toLowerCase().startsWith("["+tag);
     }
-    boolean contains(String in){
+    public boolean contains(String in){
         return in.toLowerCase().contains(tag);    
     }
-    boolean ends(String in){        
+    public String get(String in){
+        return in.replace("["+tag.toUpperCase()+" ","")
+                .replace("["+tag.toLowerCase()+" ","")
+                .replace("]","");
+    }
+    public boolean ends(String in){        
         return in.toLowerCase().contains("/"+tag);
     }
     public static final Tag MAKE = new Tag("MAKE");

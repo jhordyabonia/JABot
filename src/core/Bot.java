@@ -30,7 +30,7 @@ public class Bot extends Robot
                 return (Var)super.get(pos);
             }
         };
-        public static final String JABOT_VERSION = "JABot 1.6";
+        public static final String JABOT_VERSION = "JABot 1.702";
         private String[] dictionary;
         private static boolean pause=false;
         private static boolean stop=false;
@@ -543,9 +543,9 @@ public class Bot extends Robot
                 }else if(Tag.STOP.startsWith(to_do)){
                     return false;
                 }else if(Tag.VAR.startsWith(to_do)){
-                    var(to_do.replace("[VAR ","").replace("[var ","").replace("]",""),true);
+                    var(Tag.VAR.get(to_do),true);
                 }else if(Tag.CALCULATE.startsWith(to_do)){
-                    calcula(to_do.replace("[CALCULATE ","").replace("[calculate ","").replace("]",""));
+                    calcula(Tag.CALCULATE.get(to_do));
                 }else if(to_do.startsWith("<")){
                     ///comment html
                     continue;
@@ -554,10 +554,10 @@ public class Bot extends Robot
                 }else if(to_do.startsWith("::")){
                     //divider and comment app
                     continue;
-                }else if(Tag.LOAD.startsWith(to_do)){
-                    load_dictinary(to_do.replace("[LOAD ","").replace("[load ","").replace("]", ""));  
+                }else if(Tag.LOAD.startsWith(to_do)){ 
+                    load_dictinary(Tag.LOAD.get(to_do));  
                 }else if(Tag.REPEAT.startsWith(to_do)){    
-                    Tag.REPEAT.args = to_do.replace("[REPEAT ","").replace("[repeat ","").replace("]", "");                    
+                    Tag.REPEAT.args = Tag.REPEAT.get(to_do);
                     Tag.REPEAT.in_catch=true;                 
                 }else if(Tag.MAKE.startsWith(to_do)){                                     
                     Tag.MAKE.args=to_do;
@@ -568,17 +568,17 @@ public class Bot extends Robot
                 }else if(Tag.MOUSE.startsWith(to_do)){
                     mouse_do(to_do);
                 }else if(Tag.IF.startsWith(to_do)){
-                    Tag.IF.args = to_do.replace("[IF ","").replace("[if ","").replace("]", "");
+                    Tag.IF.args = Tag.IF.get(to_do);
                     Tag.IF.in_catch = true;
                 }else if(Tag.DELAY.startsWith(to_do)){                
-                    to_do=to_do.replace("[DELAY ","").replace("[delay ","").replace("]", "");
+                    to_do=Tag.DELAY.get(to_do);
                     try{
                         DELAY = Integer.parseInt(var(to_do));
                     }catch(NumberFormatException e){
                         DELAY = Integer.parseInt(to_do);
                     }
                 }else if(Tag.WAIT.startsWith(to_do)){                
-                    to_do=to_do.replace("[WAIT ","").replace("[wait ","").replace("]", "");
+                    to_do=Tag.WAIT.get(to_do);
                     try{
                         this.delay(Integer.parseInt(var(to_do)));
                     }catch(NumberFormatException e){
