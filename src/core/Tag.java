@@ -21,6 +21,7 @@ public class Tag{
     public static final Tag IF = new Tag("IF");
     public static final Tag ELSE = new Tag("ELSE");
     public static final Tag WAIT = new Tag("WAIT");
+    public static final Tag DELAY = new Tag("DELAY");
     public static final Tag VAR = new Tag("VAR");
     public static final Tag CALCULATE = new Tag("CALCULATE");
     public static final Tag LOAD = new Tag("LOAD");

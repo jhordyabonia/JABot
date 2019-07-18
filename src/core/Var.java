@@ -10,6 +10,10 @@ public class Var{
         type=t;
         value=v;
     }
+    public Var(VAR_TYPE t,String v){
+        type=t;
+        value=v;
+    }
     public Var(String n,VAR_TYPE t){
         name=n;
         type=t;

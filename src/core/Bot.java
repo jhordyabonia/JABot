@@ -22,7 +22,14 @@ import java.awt.Point;
 
 public class Bot extends Robot 
 {       
-        public static final  ArrayList<Var> VARS = new ArrayList();
+        public static final  ArrayList<Var> VARS = new ArrayList(){            
+            @Override
+            public Var get(int pos){
+                if(pos==-1)
+                    return null;
+                return (Var)super.get(pos);
+            }
+        };
         public static final String JABOT_VERSION = "JABot 1.6";
         private String[] dictionary;
         private static boolean pause=false;
@@ -44,7 +51,7 @@ public class Bot extends Robot
             super();
             step=0;
             var("TIME number "+System.currentTimeMillis());
-            pos();
+            mouse_pos();
 
         }
         public String[] get_dictionary(){
@@ -56,8 +63,14 @@ public class Bot extends Robot
              pause=p;stop=true;
         }
         public void  load_dictinary(String file) throws FileNotFoundException, IOException{
-             if(file==null)
+            
+             if(file==null){
                  file="default.dic";
+             }else{                 
+                String _file = var(file);
+                if(!_file.isEmpty())
+                    file = _file;
+             }            
             
              FileReader f=new FileReader(file);             
              BufferedReader b=new BufferedReader(f);
@@ -391,7 +404,7 @@ public class Bot extends Robot
             f.close();
             return out;
         }
-        private void pos(){            
+        private void mouse_pos(){            
             PointerInfo a = MouseInfo.getPointerInfo();
             Point b = a.getLocation();            
             var("MOUSEX number "+(int) b.getX());
@@ -489,34 +502,36 @@ public class Bot extends Robot
                             repeat=Integer.parseInt(sent);                    
                         } 
                         for(int i=0;i<repeat;i++)
-                         Do_(Tag.REPEAT.catched);
+                         if(Do_(Tag.REPEAT.catched))
+                            return false;
                         Tag.REPEAT.catched="";                            
                     }else {
                         Tag.REPEAT.catched+=","+to_do;
                     }
-                }else if(Tag.IF.in_catch){
+                }else if(Tag.IF.in_catch||Tag.ELSE.in_catch){
                     if(Tag.ELSE.startsWith(to_do)){ 
-                        Tag.ELSE.in_catch = !var(Tag.IF.args).equals("true"); ;
-                        Tag.ELSE.catched = "";
+                        Tag.ELSE.in_catch = true; 
+                        Tag.IF.in_catch = false;
                     }else if(Tag.IF.ends(to_do)){  
                         String catched = null;
                         if(var(Tag.IF.args).equals("true")){
-                            catched = Tag.IF.catched;
-                        }else if(Tag.ELSE.in_catch){
-                            catched = Tag.ELSE.catched; 
+                           catched = Tag.IF.catched;
+                        }else{
+                           catched = Tag.ELSE.catched; 
                         }
-                        Tag.IF.in_catch=false;  
-                        Tag.ELSE.in_catch=false;
+                        Tag.IF.in_catch = false;  
+                        Tag.ELSE.in_catch = false;
                         Tag.IF.catched = "";
                         Tag.ELSE.catched = "";
                         Tag.IF.args = "";
                         Tag.ELSE.args = "";
-                        Do_(catched);
+                        if(!Do_(catched))
+                            return false;
                     }else{                        
-                        if(Tag.ELSE.in_catch){
-                          Tag.ELSE.catched+=","+to_do;
-                        }else{
+                        if(Tag.IF.in_catch){
                           Tag.IF.catched+=","+to_do;
+                        }else if(Tag.ELSE.in_catch){
+                          Tag.ELSE.catched+=","+to_do;
                         }
                     }
                 }else if(Tag.DESCRIP.in_catch){    
@@ -528,9 +543,9 @@ public class Bot extends Robot
                 }else if(Tag.STOP.startsWith(to_do)){
                     return false;
                 }else if(Tag.VAR.startsWith(to_do)){
-                    var(to_do.toUpperCase().replace("[VAR ","").replace("]",""),true);
+                    var(to_do.replace("[VAR ","").replace("[var ","").replace("]",""),true);
                 }else if(Tag.CALCULATE.startsWith(to_do)){
-                    calcula(to_do.toUpperCase().replace("[CALCULATE ","").replace("]",""));
+                    calcula(to_do.replace("[CALCULATE ","").replace("[calculate ","").replace("]",""));
                 }else if(to_do.startsWith("<")){
                     ///comment html
                     continue;
@@ -540,22 +555,30 @@ public class Bot extends Robot
                     //divider and comment app
                     continue;
                 }else if(Tag.LOAD.startsWith(to_do)){
-                    load_dictinary(to_do.toUpperCase().replace("[LOAD ","").replace("]", ""));  
+                    load_dictinary(to_do.replace("[LOAD ","").replace("[load ","").replace("]", ""));  
                 }else if(Tag.REPEAT.startsWith(to_do)){    
-                    Tag.REPEAT.args = to_do.toUpperCase().replace("[REPEAT ","").replace("]", "");                    
+                    Tag.REPEAT.args = to_do.replace("[REPEAT ","").replace("[repeat ","").replace("]", "");                    
                     Tag.REPEAT.in_catch=true;                 
                 }else if(Tag.MAKE.startsWith(to_do)){                                     
                     Tag.MAKE.args=to_do;
                     Tag.MAKE.in_catch=true;
                 }else if(Tag.NOW.startsWith(to_do)){
-                    run(to_do); 
+                    if(!now())
+                        return false;
                 }else if(Tag.MOUSE.startsWith(to_do)){
                     mouse_do(to_do);
                 }else if(Tag.IF.startsWith(to_do)){
-                    Tag.IF.args = to_do.toUpperCase().replace("[IF ","").replace("]", "");
+                    Tag.IF.args = to_do.replace("[IF ","").replace("[if ","").replace("]", "");
                     Tag.IF.in_catch = true;
+                }else if(Tag.DELAY.startsWith(to_do)){                
+                    to_do=to_do.replace("[DELAY ","").replace("[delay ","").replace("]", "");
+                    try{
+                        DELAY = Integer.parseInt(var(to_do));
+                    }catch(NumberFormatException e){
+                        DELAY = Integer.parseInt(to_do);
+                    }
                 }else if(Tag.WAIT.startsWith(to_do)){                
-                    to_do=to_do.toUpperCase().replace("[WAIT ","").replace("]", "");
+                    to_do=to_do.replace("[WAIT ","").replace("[wait ","").replace("]", "");
                     try{
                         this.delay(Integer.parseInt(var(to_do)));
                     }catch(NumberFormatException e){
@@ -590,6 +613,14 @@ public class Bot extends Robot
             char op = data[1].charAt(0);
             Var a = VARS.get(pos_var(data[2]));
             Var b = data.length>3?VARS.get(pos_var(data[3])):new Var("", VAR_TYPE.number);
+            
+            if(a==null){
+                a=autoMakeVar(data[2]);
+            }
+            if(b==null){
+                b=autoMakeVar(data[3]);
+            }
+
             Var result = Var.calcula(a, b, op);
             if(!data[0].equals("="))
                 result.name = data[0];
@@ -604,14 +635,30 @@ public class Bot extends Robot
             }
             return result.value;
         }
+        private Var autoMakeVar(String data){
+            Var out;
+            try{
+                Integer.parseInt(data);
+                out = new Var(Var.VAR_TYPE.number, data);
+            }catch(NumberFormatException e){
+                if(data.toLowerCase().equals("true")){                        
+                    out = new Var(VAR_TYPE.bool, "true");
+                }else if(data.toLowerCase().equals("false")){              
+                    out = new Var(VAR_TYPE.bool, "false");
+                }else{                                
+                    out = new Var(VAR_TYPE.string,data);
+                }
+            }
+            return out;
+        }
         public final String var(String in){
             return var(in,false);
         }        
         public final String var(String in,boolean print){  
-             if(in.isEmpty()){
+             if(in.toLowerCase().startsWith("[vars")){
                 int count = 0;
                 String out = "";
-                pos();
+                mouse_pos();
                 System.out.println("VARS:")                    ;
                 for (Var var : VARS) {
                     count++;
@@ -626,11 +673,11 @@ public class Bot extends Robot
             int pos = pos_var(name);
             if(data.length<2&&pos!=-1){
                 if(in.toLowerCase().contains("mouse"))
-                    pos();
+                    mouse_pos();
 
                 if(Bot.MODE=='i')
                     System.out.println(VARS.get(pos).value);
-                return VARS.get(pos).value.toLowerCase();
+                return VARS.get(pos).value;
             }
             if(data.length<2)
                 return "";
@@ -659,8 +706,7 @@ public class Bot extends Robot
             }
             return -1;
         }
-        public void make(String data_in,String param) 
-        {   
+        public void make(String data_in,String param){   
             //boolean append=param.contains("+");
              
             String[] data=data_in.split(",");
@@ -704,42 +750,29 @@ public class Bot extends Robot
             return data;
         }
         //excecute tag now
-        private void run(String in)
-        {   
+        private boolean now(){   
             Transferable t = io.getContents(this);
-
             DataFlavor dataFlavorStringJava=null;
             try 
             {
                 dataFlavorStringJava = new DataFlavor( "application/x-java-serialized-object; class=java.lang.String");
             } catch (ClassNotFoundException ex){}
-            if (dataFlavorStringJava==null)return;
+            if (dataFlavorStringJava==null)
+                return false;
 
             try { clipboard = (String) t.getTransferData(dataFlavorStringJava);}
             catch (UnsupportedFlavorException ex) {} catch (IOException ex){}
-            if(clipboard==null)
-            { System.out.println("\nFormat err.");return;   }
+            if(clipboard==null){
+                 System.out.println("\nFormat err.");
+                 return false;   
+            }
             
-            try 
-            { 
+            try{ 
                 clipboard=clipboard.toLowerCase();
-                in=in.replace("[NOW ", "");
-                in=in.substring(0,in.length()-1);
-                in=in.toLowerCase();
-                String _else="";
-                if (t.isDataFlavorSupported(dataFlavorStringJava))
-                {   
-                    for(String d:in.split(" "))
-                        if(d.startsWith("+"))
-                        {_else=d.substring(1);}
-                        else if(clipboard.equals(d))
-                        {Do_(clipboard);return;}
-                }
-                if(!_else.equals(""))
-                {Do_(_else);return;}
-                Do_(clipboard);
-            } catch (IOException ex) { }     
-            
+                return Do_(clipboard);
+            } catch (IOException ex) { }   
+            return false;
+
         }        
        
 	
