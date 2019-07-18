@@ -25,11 +25,9 @@ public class Bot extends Robot
         public static final  ArrayList<Var> VARS = new ArrayList();
         public static final String JABOT_VERSION = "JABot 1.6";
         private String[] dictionary;
-        private boolean in_catch=false;
         private static boolean pause=false;
         private static boolean stop=false;
         public static boolean LOG=false;
-        private String catched="";
         public static int DELAY=0;
         public static char MODE='d';
         private final Clipboard io = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -42,15 +40,14 @@ public class Bot extends Robot
             return e;
         }        
     
-        public Bot() throws AWTException
-        { 
+        public Bot() throws AWTException{ 
             super();
             step=0;
             var("TIME number "+System.currentTimeMillis());
             pos();
+
         }
-        public String[] get_dictionary()
-        {
+        public String[] get_dictionary(){
             return dictionary;
         }
         public static boolean isPause(){return pause;}
@@ -58,8 +55,7 @@ public class Bot extends Robot
         public void stop(boolean p){
              pause=p;stop=true;
         }
-        public void  load_dictinary(String file) throws FileNotFoundException, IOException
-        {
+        public void  load_dictinary(String file) throws FileNotFoundException, IOException{
              if(file==null)
                  file="default.dic";
             
@@ -70,8 +66,7 @@ public class Bot extends Robot
              if(t>202)
                  throw new IOException();
              dictionary=new String[203];
-             for(int o=t;o>=0;o--)
-             {
+             for(int o=t;o>=0;o--){
                  String g=b.readLine();
                  if(g==null)continue;
                  String r[]=g.split(":");
@@ -81,18 +76,16 @@ public class Bot extends Robot
              
             System.out.println(JABOT_VERSION+"  dictionary: "+file);
         }
-        public boolean releaseKey(char key) throws IOException
-        {   return releaseKey(get_key(""+key)); }
-        public boolean releaseKey(int key)
-        { 
+        public boolean releaseKey(char key) throws IOException{
+            return releaseKey(get_key(""+key)); 
+        }
+        public boolean releaseKey(int key){ 
             if(key==-1)return false;
             this.keyRelease(get_key(key));
             return true;
         }    
-        public static int get_key(int key)
-        {                    
-         switch(key)
-            {                
+        public static int get_key(int key){                    
+         switch(key){                
                 case 0: return KeyEvent.KEY_FIRST;
                 case 1: return KeyEvent.KEY_LAST;
                 //case 2: return KeyEvent.static char;
@@ -299,25 +292,24 @@ public class Bot extends Robot
             }
             return -1;
         }
-        public boolean pressKey(char key) throws IOException 
-        {return pressKey(get_key(""+key));}
-        public boolean pressKey(int key) 
-        {
+        public boolean pressKey(char key) throws IOException{
+            return pressKey(get_key(""+key));
+        }
+        public boolean pressKey(int key){
             if(key==-1)return false;
             try{
                 this.keyPress(get_key(key));
-            }catch(Exception e)
-            {/*System.out.
-                    println("get_key(key) > "
-                    +get_key(key)+"/ key > "+key);*/
+            }catch(Exception e){
+                /*System.out.
+                println("get_key(key) > "
+                +get_key(key)+"/ key > "+key);*/
             }
             return true;
         }        
         private int get_key(String key) throws IOException
         {
             int out=-1;
-            for(String c:dictionary)
-            {
+            for(String c:dictionary){
                 out++;
                 if(c==null)continue;
                 
@@ -325,14 +317,11 @@ public class Bot extends Robot
                     return out;
             }
             String []h=key.split(" ");
-            Do(h[0],h.length>1?h[1]:null);
-            
+            Do(h[0],h.length>1?h[1]:null);            
             return -1;
         }        
-        private String tranform(String key)
-        {
-            switch(key.charAt(0))
-            {
+        private String tranform(String key){
+            switch(key.charAt(0)){
                 case ' ': return "SPACE";
                 case '.': return "PERIOD";
                 case ',': return "COMMA";
@@ -365,15 +354,12 @@ public class Bot extends Robot
             }
             return key;
         }
-        public boolean type(String text) throws IOException
-        {
+        public boolean type(String text) throws IOException{
             return type(text,DELAY);
         }
-        public boolean type(String text,int t) throws IOException 
-        {
+        public boolean type(String text,int t) throws IOException{
             text=text.toUpperCase();
-            for(int c=0;c<text.length();c++)
-            {
+            for(int c=0;c<text.length();c++){
                 this.delay(t);
                 int tt=get_key(""+text.charAt(c));
                 pressKey(tt);
@@ -381,10 +367,10 @@ public class Bot extends Robot
             }
             return true;
         }
-        public String Do(String file,String  block) throws IOException
-        {   return Do(file,block,true);} 
-        public String Do(String file,String  block,boolean r) throws IOException
-        {    
+        public String Do(String file,String  block) throws IOException{
+            return Do(file,block,true);
+        } 
+        public String Do(String file,String  block,boolean r) throws IOException{    
             if(file==null)
                 file="default.do";
             FileReader f= new FileReader(file);
@@ -408,11 +394,11 @@ public class Bot extends Robot
                    if(c==null)break;
                    if(c.contains("::"+block))
                      active=!active;
-                   if(active)
+                   if(active){
                     if(r)Do_(c);
                     else out+=c;
-                   
-                    before=c;
+                   }
+                   before=c;
                 }while(true);
              }
             try {f.close();}
@@ -425,17 +411,14 @@ public class Bot extends Robot
             var("MOUSEX number "+(int) b.getX());
             var("MOUSEY number "+(int) b.getY());
         }
-        public void click(int btn,int x)
-        {
+        public void click(int btn,int x){
              if(x==0)
              { this.mousePress(btn);}
              else if(x==1)
              {this.mouseRelease(btn); }
              else{this.mousePress(btn);this.mouseRelease(btn); }
         }
-        public void mouse_do(String to_do)
-        {
-            pos();
+        public void mouse_do(String to_do){
             PointerInfo a = MouseInfo.getPointerInfo();
             Point b = a.getLocation();            
             var("MOUSEX number "+(int) b.getX());
@@ -475,8 +458,7 @@ public class Bot extends Robot
                     mouseMove(x,y); 
             }       
         }    
-        public void Do_(String in) throws IOException 
-        {        
+        public void Do_(String in) throws IOException{        
             var("TIME number "+System.currentTimeMillis());
             if(LOG){  
                 path_fail+="\n#"+step++;
@@ -498,8 +480,7 @@ public class Bot extends Robot
                 in=get_var(in);
             }
             
-            for(String to_do:in.split(","))
-            {
+            for(String to_do:in.split(",")){
                 if(LOG)
                     path_fail+=">>"+to_do;
                 if(to_do==null)continue;
@@ -635,13 +616,14 @@ public class Bot extends Robot
             }
             return result.value;
         }
-        public String var(String in){
+        public final String var(String in){
             return var(in,false);
         }        
-        public String var(String in,boolean print){  
+        public final String var(String in,boolean print){  
              if(in.isEmpty()){
                 int count = 0;
                 String out = "";
+                pos();
                 System.out.println("VARS:")                    ;
                 for (Var var : VARS) {
                     count++;
@@ -651,11 +633,13 @@ public class Bot extends Robot
                 }
                 return count+out;
             }
-            String data[] = in.split(" ");            
-           
+            String data[] = in.split(" ");         
             String name =  data[0].toUpperCase();
             int pos = pos_var(name);
             if(data.length<2&&pos!=-1){
+                if(in.toLowerCase().contains("mouse"))
+                    pos();
+
                 if(Bot.MODE=='i')
                     System.out.println(VARS.get(pos).value);
                 return VARS.get(pos).value.toLowerCase();
@@ -731,6 +715,7 @@ public class Bot extends Robot
             }
             return data;
         }
+        //excecute tag now
         private void run(String in)
         {   
             Transferable t = io.getContents(this);
