@@ -370,39 +370,25 @@ public class Bot extends Robot
         public String Do(String file,String  block) throws IOException{
             return Do(file,block,true);
         } 
-        public String Do(String file,String  block,boolean r) throws IOException{    
-            if(file==null)
-                file="default.do";
-            FileReader f= new FileReader(file);
+        public String Do(String file,String  block,boolean r) throws IOException{ 
+            FileReader  f = new FileReader(file);
             BufferedReader b=new BufferedReader(f);
-            String c = "",out="", before="";
-            int line=0; 
-            if(block==null){
-                do{      
-                    try {c=b.readLine(); } catch (IOException ex) 
-                    {System.out.println("Err at time readig the File\nLine: "+line+"\nLast line Ok: "+before);}
-                    if(r)Do_(c);
-                    else out+=c;
-                    before=c;
-                }while(c!=null);
-            }else{
-               boolean active=false;
-               do{      
-                   try {  c=b.readLine(); } catch (IOException ex) 
-                   {System.out.println("Err at time readig the File\nLine: "+line+"\nLast line Ok: "+before);}
-                    
-                   if(c==null)break;
-                   if(c.contains("::"+block))
-                     active=!active;
-                   if(active){
-                    if(r)Do_(c);
-                    else out+=c;
-                   }
-                   before=c;
-                }while(true);
-             }
-            try {f.close();}
-            catch (IOException ex) {}
+            boolean next = true, active = block==null;
+            String c,out="";            
+            do{      
+                c=b.readLine();
+                if(c==null)break;
+                if(block!=null){
+                 if(c.startsWith("::"+block))
+                   active=!active;
+                }
+                if(active){
+                 if(r){
+                     next=Do_(c);
+                 }else out+=c;
+                }
+            }while(next);
+            f.close();
             return out;
         }
         private void pos(){            
@@ -458,7 +444,8 @@ public class Bot extends Robot
                     mouseMove(x,y); 
             }       
         }    
-        public void Do_(String in) throws IOException{        
+        public boolean Do_(String in) throws IOException{            
+            if(in==null)return false;
             var("TIME number "+System.currentTimeMillis());
             if(LOG){  
                 path_fail+="\n#"+step++;
@@ -473,7 +460,6 @@ public class Bot extends Robot
                    Thread.sleep(DELAY);
                  if(stop)System.exit(0);
              }catch (InterruptedException ex) {}
-            if(in==null)return;
             
             in=in.trim();
             if(in.toLowerCase().contains(Tag.VAR.tag+"::")){
@@ -484,9 +470,7 @@ public class Bot extends Robot
                 if(LOG)
                     path_fail+=">>"+to_do;
                 if(to_do==null)continue;
-                if(Tag.STOP.startsWith(to_do)){
-                    return;
-                }else if(Tag.MAKE.in_catch){
+                if(Tag.MAKE.in_catch){
                     if(Tag.MAKE.ends(to_do)){
                         Tag.MAKE.in_catch=false;
                         make(Tag.MAKE.catched,to_do);
@@ -535,22 +519,25 @@ public class Bot extends Robot
                           Tag.IF.catched+=","+to_do;
                         }
                     }
-                    continue;
                 }else if(Tag.DESCRIP.in_catch){    
                     if(Tag.DESCRIP.contains(to_do)){
                         Tag.DESCRIP.in_catch=false;
                     }else{
                         Tag.DESCRIP.catched+=","+to_do;                        
                     }              
+                }else if(Tag.STOP.startsWith(to_do)){
+                    return false;
                 }else if(Tag.VAR.startsWith(to_do)){
                     var(to_do.toUpperCase().replace("[VAR ","").replace("]",""),true);
                 }else if(Tag.CALCULATE.startsWith(to_do)){
                     calcula(to_do.toUpperCase().replace("[CALCULATE ","").replace("]",""));
                 }else if(to_do.startsWith("<")){
+                    ///comment html
                     continue;
                 }else if(Tag.DESCRIP.contains(to_do)){
                     Tag.DESCRIP.in_catch=true;
                 }else if(to_do.startsWith("::")){
+                    //divider and comment app
                     continue;
                 }else if(Tag.LOAD.startsWith(to_do)){
                     load_dictinary(to_do.toUpperCase().replace("[LOAD ","").replace("]", ""));  
@@ -596,6 +583,7 @@ public class Bot extends Robot
                     }else type(type[0]); 
                 }
             }
+            return true;
         }
         public String  calcula(String in){ 
             String data[] = in.split(" ");
