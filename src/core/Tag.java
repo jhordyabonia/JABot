@@ -33,5 +33,6 @@ public class Tag{
     public static final Tag MOUSE = new Tag("MOUSE");
     public static final Tag NOW = new Tag("NOW");
     public static final Tag STOP = new Tag("STOP");
+    public static final Tag BREAK = new Tag("BREAK");
     public static final Tag DESCRIP = new Tag("::DESCRIP");
 }

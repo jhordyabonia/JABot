@@ -30,7 +30,7 @@ public class Bot extends Robot
                 return (Var)super.get(pos);
             }
         };
-        public static final String JABOT_VERSION = "JABot 1.702";
+        public static final String JABOT_VERSION = "JABot 1.7";
         private String[] dictionary;
         private static boolean pause=false;
         private static boolean stop=false;
@@ -540,6 +540,8 @@ public class Bot extends Robot
                     }else{
                         Tag.DESCRIP.catched+=","+to_do;                        
                     }              
+                }else if(Tag.BREAK.startsWith(to_do)){
+                    break;
                 }else if(Tag.STOP.startsWith(to_do)){
                     return false;
                 }else if(Tag.VAR.startsWith(to_do)){
