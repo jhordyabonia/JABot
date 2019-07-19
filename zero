@@ -1,0 +1,56 @@
+::objetives
+[var base number 10]
+::objetives
+::knowledge
+[cerovar]
+::knowledge
+::test
+[calculate r = x base]
+[if r]
+[stop]
+[/if]
+::test
+::logic
+::probabilities
+[calculate c0.0 - x y]
+[calculate c1.0 - y x]
+[calculate c2.0 - y y]
+[calculate c3.0 + x x]
+[calculate c4.0 + x y]
+[calculate c5.0 + y y]
+[calculate c6.0 * x x]
+[calculate c7.0 * x y]
+[calculate c8.0 * y y]
+[calculate c9.0 / y y]
+[calculate c10.0 / y x]
+[calculate c11.0 / x y]
+[calculate c12.0 / x x]
+::probabilities
+::[stop]
+::order
+[var count number 0.0]
+[repeat 64]
+[var n number count]
+[calculate count + 1 count]
+[calculate namecount + c count]
+[calculate namen + c n]
+[calculate test > var::namen var::namecount]
+[if test]
+[var temp number n]
+[var var::namecount number var::namen]
+[var var::namen number var::temp]
+[else]
+[var temp number var::namen]
+[var var::namen number var::namecount]
+[var var::namecount number var::temp]
+[/if]
+[calculate test = count 12]
+[if test]
+[var count number 0.0]
+[/if]
+[/repeat]
+[stop]
+[/if]
+[calculate test > cvar::count base]
+[if test]
+::order
