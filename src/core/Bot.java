@@ -743,11 +743,14 @@ public class Bot extends Robot
                     n=v.replace(Tag.VAR.tag.toUpperCase()+"::", "");
                     break;
                 }
-            }
-            String var = var(n);
-            if(!var.isEmpty()){
-                data=data.replace(Tag.VAR.tag.toUpperCase()+"::"+n, var);
-                data=data.replace(Tag.VAR.tag+"::"+n, var);
+                
+                if(!n.isEmpty()){
+                    String var = var(n);
+                    if(!var.isEmpty()){
+                        data = data.replace(Tag.VAR.tag.toUpperCase()+"::"+n, var)
+                                 .replace(Tag.VAR.tag+"::"+n, var);
+                    }
+                }
             }
             return data;
         }
