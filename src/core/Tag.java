@@ -35,4 +35,6 @@ public class Tag{
     public static final Tag STOP = new Tag("STOP");
     public static final Tag BREAK = new Tag("BREAK");
     public static final Tag DESCRIP = new Tag("::DESCRIP");
+    public static final Tag LOG = new Tag("LOG");
+    public static final Tag COMMANDS = new Tag("COMMANDS");
 }

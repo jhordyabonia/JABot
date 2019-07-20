@@ -19,6 +19,7 @@ import java.awt.AWTException;
 import java.util.ArrayList;
 import core.Var.VAR_TYPE;
 import java.awt.Point;
+import java.io.File;
 
 public class Bot extends Robot 
 {       
@@ -62,16 +63,57 @@ public class Bot extends Robot
         public void stop(boolean p){
              pause=p;stop=true;
         }
-        public void  load_dictinary(String file) throws FileNotFoundException, IOException{
+        
+        public void commands(String in) throws FileNotFoundException, IOException{
+             String option[]=in.split(" ");
+            if(option.length<2)
+                return;
+            if(option[0].toLowerCase().equals("list")){
+                option[0] = "";
+               commands_list(String.join(" ", option));
+            }else if(option[0].toLowerCase().equals("load")){
+                option[0] = "";
+               commands_load(String.join(" ", option));
+               //(Do_(String.join(" ", option)));
+            }
+        }
+        public void commands_load(String in) throws FileNotFoundException, IOException{
             
+            String file="."+in;            
+            File f=new File(file),tmp;
+            for(String item:f.list()){
+                tmp= new File(item);
+                if(tmp.isDirectory()){
+                    commands_load(file+"/"+item);
+                }else{
+                    Do(file+"/"+item,null);
+                }
+            }             
+        }
+        public void commands_list(String in) throws FileNotFoundException, IOException{
+           String file="./"+in;            
+            File f=new File(file),tmp;
+            for(String item:f.list()){
+                tmp= new File(item);
+                if(tmp.isDirectory()){
+                    commands_list(file+"/"+item);
+                }else{
+                    var(file+"."+item+" string "+file+"/"+item);                    
+                    if(Bot.MODE=='i')
+                        System.out.println(file+"."+item);
+                }
+            }  
+             
+        }
+        public void  load_dictinary(String file) throws FileNotFoundException, IOException{
              if(file==null){
                  file="default.dic";
              }else{                 
                 String _file = var(file);
                 if(!_file.isEmpty())
                     file = _file;
-             }            
-            
+             }   
+             
              FileReader f=new FileReader(file);             
              BufferedReader b=new BufferedReader(f);
              //largo de archivo
@@ -85,8 +127,7 @@ public class Bot extends Robot
                  String r[]=g.split(":");
                  dictionary[Integer.parseInt(r[0])]=r[1];                 
              }
-             f.close(); 
-             
+             f.close();             
             System.out.println(JABOT_VERSION+"  dictionary: "+file);
         }
         public boolean releaseKey(char key) throws IOException{
@@ -610,6 +651,25 @@ public class Bot extends Robot
             }
             return true;
         }
+        public String log(String in){
+            String out="";
+            String option[]=in.split(" ");
+            if(option.length<2)
+                return out;
+            switch(option[0].charAt(0)){
+                case 's':
+                    //String name = option[1];
+                    //save log 
+                    break;
+                case 'c':
+                    //limpiar registro
+                    break;
+                case 'l':
+                    //int numberToClean = Integer.parseInt(option[1]);
+                    //limpiar registro, 
+            }
+            return out;
+        }
         public String  calcula(String in){ 
             String data[] = in.split(" ");
             char op = data[1].charAt(0);
@@ -734,18 +794,15 @@ public class Bot extends Robot
             {System.out.println("Err: Command no made");}
         } 
         private String get_var(String data){
-            String n ="";
+            String n ="",var;
             for(String v:data.replace("]", "").split(" ")){
                 if(v.startsWith(Tag.VAR.tag+"::")){
                     n=v.replace(Tag.VAR.tag+"::", "");
-                    break;
                 }else if(v.startsWith(Tag.VAR.tag.toUpperCase()+"::")){
                     n=v.replace(Tag.VAR.tag.toUpperCase()+"::", "");
-                    break;
-                }
-                
+                }                
                 if(!n.isEmpty()){
-                    String var = var(n);
+                    var = var(n);
                     if(!var.isEmpty()){
                         data = data.replace(Tag.VAR.tag.toUpperCase()+"::"+n, var)
                                  .replace(Tag.VAR.tag+"::"+n, var);
