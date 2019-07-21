@@ -40,7 +40,7 @@ public class Bot extends Robot
         public static char MODE='d';
         private final Clipboard io = Toolkit.getDefaultToolkit().getSystemClipboard();
         private String clipboard = "";
-        private static int step=0;
+        public static int step=0;
         private static String path_fail="";
         public static String getLog(){
             String e=""+path_fail;
@@ -62,49 +62,7 @@ public class Bot extends Robot
         public static void pause(boolean p){ pause=p;}
         public void stop(boolean p){
              pause=p;stop=true;
-        }
-        
-        public void commands(String in) throws FileNotFoundException, IOException{
-             String option[]=in.split(" ");
-            if(option.length<2)
-                return;
-            if(option[0].toLowerCase().equals("list")){
-                option[0] = "";
-               commands_list(String.join(" ", option));
-            }else if(option[0].toLowerCase().equals("load")){
-                option[0] = "";
-               commands_load(String.join(" ", option));
-               //(Do_(String.join(" ", option)));
-            }
-        }
-        public void commands_load(String in) throws FileNotFoundException, IOException{
-            
-            String file="."+in;            
-            File f=new File(file),tmp;
-            for(String item:f.list()){
-                tmp= new File(item);
-                if(tmp.isDirectory()){
-                    commands_load(file+"/"+item);
-                }else{
-                    Do(file+"/"+item,null);
-                }
-            }             
-        }
-        public void commands_list(String in) throws FileNotFoundException, IOException{
-           String file="./"+in;            
-            File f=new File(file),tmp;
-            for(String item:f.list()){
-                tmp= new File(item);
-                if(tmp.isDirectory()){
-                    commands_list(file+"/"+item);
-                }else{
-                    var(file+"."+item+" string "+file+"/"+item);                    
-                    if(Bot.MODE=='i')
-                        System.out.println(file+"."+item);
-                }
-            }  
-             
-        }
+        }        
         public void  load_dictinary(String file) throws FileNotFoundException, IOException{
              if(file==null){
                  file="default.dic";
@@ -589,14 +547,16 @@ public class Bot extends Robot
                     var(Tag.VAR.get(to_do),true);
                 }else if(Tag.CALCULATE.startsWith(to_do)){
                     calcula(Tag.CALCULATE.get(to_do));
+                }else if(Tag.COMMANDS.startsWith(to_do)){
+                    commands(Tag.COMMANDS.get(to_do));
+                }else if(Tag.LOG.startsWith(to_do)){
+                    log(Tag.LOG.get(to_do));
                 }else if(to_do.startsWith("<")){
                     ///comment html
-                    continue;
                 }else if(Tag.DESCRIP.contains(to_do)){
                     Tag.DESCRIP.in_catch=true;
                 }else if(to_do.startsWith("::")){
                     //divider and comment app
-                    continue;
                 }else if(Tag.LOAD.startsWith(to_do)){ 
                     load_dictinary(Tag.LOAD.get(to_do));  
                 }else if(Tag.REPEAT.startsWith(to_do)){    
@@ -651,24 +611,83 @@ public class Bot extends Robot
             }
             return true;
         }
-        public String log(String in){
-            String out="";
+        
+        public void commands(String in) throws FileNotFoundException, IOException{
+            String option[]=in.split(" ");
+            if(option[0].toLowerCase().equals("load")){ 
+                for(Var var:VARS){
+                    if(var.type==VAR_TYPE.command){
+                        if(option.length>1){
+                            if(var.name.equals(option[1].toUpperCase())){
+                                Do(var.value,option.length>2?option[2]:null);
+                                return ;
+                            }
+                        }
+                    }
+                }
+            }else if(option[0].toLowerCase().equals("list")){ 
+                commands_list(option.length>1?option[1]:"");
+            }
+        }
+        public void commands_list(String in) throws FileNotFoundException, IOException{            
+            String file=in.isEmpty()?"./":in;            
+            File f=new File(file),tmp;
+            for(String item:f.list()){
+                tmp= new File(item);
+                if(tmp.isDirectory()){
+                    commands_list(file+"/"+item);
+                }else if(!tmp.getName().contains(".dic")){
+                    String value = file+"/"+item,
+                            name = in.replace("/", ".")+"."+item.replace(" ", "_");  
+                    var(name+" command "); 
+                    Var var = VARS.get(pos_var(name));
+                    var.value = value;
+                    if(Bot.MODE=='i')
+                        System.out.println(name);
+                }
+            }             
+        }        
+        public void log(String in){
             String option[]=in.split(" ");
             if(option.length<2)
-                return out;
-            switch(option[0].charAt(0)){
+                return;
+            switch(option[0].toLowerCase().charAt(0)){
                 case 's':
                     //String name = option[1];
-                    //save log 
+                     try {
+                        FileWriter f = new FileWriter(option[1]);
+                        String data[]=getLog().trim().split("#");
+                        int x,end=data.length-1;
+                        for(int i=0;i<data.length;i++) {
+                            if(data[i].trim().isEmpty())
+                                continue;
+                            x = 1+data[i].indexOf("->>");                            
+                            data[i] = data[i].substring(x<0?0:x).replace(">>","");
+                            if(i==end){
+                                data[i]="::"+data[i];
+                            }else if(data[i].toLowerCase().contains(Tag.VAR.tag+"::")){
+                                data[i]=get_var(data[i]);
+                            }
+                            f.write(data[i].trim()+'\n');
+                        }
+                        f.close();
+                    } catch (IOException ex) 
+                    {System.out.println("Err: Command no made");}
+                case 'c':  
+                    String tmp []=getLog().split("#");
+                    int numberToClean = tmp.length;            
+                    try{int t=Integer.parseInt(option[1]);
+                        if(t<numberToClean){
+                           numberToClean=t;
+                        }
+                    }catch(NumberFormatException ex){}                                        
+                    for(int i=0;i<numberToClean;i++){
+                        tmp[i]="";
+                    }
+                    path_fail=String.join("#", tmp);
+                    System.gc();
                     break;
-                case 'c':
-                    //limpiar registro
-                    break;
-                case 'l':
-                    //int numberToClean = Integer.parseInt(option[1]);
-                    //limpiar registro, 
             }
-            return out;
         }
         public String  calcula(String in){ 
             String data[] = in.split(" ");
@@ -745,14 +764,19 @@ public class Bot extends Robot
                 return "";
             
             String type = data[1].toLowerCase();
+                       
             data[0]=data[1]="";
             String value = String.join(" ",data).trim();               
-            
-            String v = var(value);
-            value = !v.isEmpty()?v:value;
+            if(!value.contains(" ")){
+                String v = var(value);
+                value = !v.isEmpty()?v:value;
+            }
             if(pos!=-1){
+                if(type.equals("remove")){
+                    VARS.remove(pos);
+                    return "";
+                } 
                 Var tmp = VARS.get(pos);
-                //value = get_var(value);
                 tmp.value = value;
                 tmp.type = VAR_TYPE.valueOf(type);
             }else{                
@@ -768,8 +792,7 @@ public class Bot extends Robot
             }
             return -1;
         }
-        public void make(String data_in,String param){   
-            //boolean append=param.contains("+");
+        public void make(String data_in,String param){  
              
             String[] data=data_in.split(",");
 
