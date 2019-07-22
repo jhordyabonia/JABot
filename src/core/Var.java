@@ -63,29 +63,33 @@ public class Var{
                 else  _value = aa.toUpperCase().equals(bb.toUpperCase()) && aa.equals("true")?aa:"false";
                 return new Var(_name,a.type,_value);
             case string:
-                if(op=='+')                    
+                if(op=='+') {                   
                     _value = a.value + b.value;
-                else{ 
-                    try{
-                        int y=Integer.parseInt(""+op);
-                        _value=a.value.split(" ")[y];
-                    }catch(NumberFormatException e){
-                    }
+                }else if(op=='-'){
+                     String data[]=a.value.split(" ");
+                     index = Integer.parseInt(b.value);
+                     data[index] = "";
+                     _value = String.join(" ",data).trim();
+                }else{
+                    _type = VAR_TYPE.bool;
+                    if(op=='='){
+                        _value = a.value.equals(b.value)?"true":"false";
+                    }else if(op=='>'){
+                        _value = a.value.startsWith(b.value)?"true":"false";
+                    }else if(op=='<'){
+                        _value = a.value.endsWith(b.value)?"true":"false";
+                    }                    
                 }
                 return new Var(_name,a.type,_value);
             case command:
                 _value = "false";
                 if(op=='?') {
                     try{
-                        int s = Bot.step;
-                        Bot bot=new Bot();
                         String option[]=a.value.split(" ");
                         if(option.length>0){
-                            bot.Do(option[0],option.length>1?option[1]:null);
+                            (new Bot()).Do(option[0],option.length>1?option[1]:null);
+                             _value = "true";
                         }
-                                
-                        bot.log("c "+(Bot.step-s));
-                        _value = "true";
                     }catch(Exception e){}
                 }
                 return new Var(_name,VAR_TYPE.bool,_value);
