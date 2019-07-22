@@ -566,8 +566,7 @@ public class Bot extends Robot
                     Tag.MAKE.args=to_do;
                     Tag.MAKE.in_catch=true;
                 }else if(Tag.NOW.startsWith(to_do)){
-                    if(!now())
-                        return false;
+                    now(Tag.NOW.get(to_do));
                 }else if(Tag.MOUSE.startsWith(to_do)){
                     mouse_do(to_do);
                 }else if(Tag.IF.startsWith(to_do)){
@@ -835,7 +834,7 @@ public class Bot extends Robot
             return data;
         }
         //excecute tag now
-        private boolean now(){   
+        private void now(String nameVar){   
             Transferable t = io.getContents(this);
             DataFlavor dataFlavorStringJava=null;
             try 
@@ -843,21 +842,17 @@ public class Bot extends Robot
                 dataFlavorStringJava = new DataFlavor( "application/x-java-serialized-object; class=java.lang.String");
             } catch (ClassNotFoundException ex){}
             if (dataFlavorStringJava==null)
-                return false;
+                return ;
 
             try { clipboard = (String) t.getTransferData(dataFlavorStringJava);}
             catch (UnsupportedFlavorException ex) {} catch (IOException ex){}
             if(clipboard==null){
                  System.out.println("\nFormat err.");
-                 return false;   
+                 return ;   
             }
             
-            try{ 
-                clipboard=clipboard.toLowerCase();
-                return Do_(clipboard);
-            } catch (IOException ex) { }   
-            return false;
-
+            clipboard=clipboard.toLowerCase();
+            var(nameVar+" string "+clipboard);
         }        
        
 	
