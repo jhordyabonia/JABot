@@ -16,7 +16,7 @@ public class Tag{
     public String get(String in){
         return in.replace("["+tag.toUpperCase()+" ","")
                 .replace("["+tag.toLowerCase()+" ","")
-                .replace("]","");
+                .replace("]","").trim();
     }
     public boolean ends(String in){        
         return in.toLowerCase().contains("/"+tag);

@@ -496,12 +496,12 @@ public class Bot extends Robot
                         String sent = Tag.REPEAT.args;
                         int repeat = 0;
                         try{
-                            repeat=Integer.parseInt(var(sent));
+                            repeat=Integer.parseInt(sent);
                         }catch(NumberFormatException e){
-                            repeat=Integer.parseInt(sent);                    
+                            repeat=Integer.parseInt(var(sent));                    
                         } 
                         for(int i=0;i<repeat;i++)
-                         if(Do_(Tag.REPEAT.catched))
+                         if(!Do_(Tag.REPEAT.catched))
                             return false;
                         Tag.REPEAT.catched="";                            
                     }else {
