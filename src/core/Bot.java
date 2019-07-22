@@ -1,5 +1,8 @@
 package core;
-
+import java.awt.*;
+import java.awt.image.*;
+import java.io.*;
+import javax.imageio.ImageIO;
 import java.awt.MouseInfo;
 import java.awt.PointerInfo;
 import java.awt.Robot; 
@@ -543,6 +546,8 @@ public class Bot extends Robot
                     break;
                 }else if(Tag.STOP.startsWith(to_do)){
                     return false;
+                }else if(Tag.SCREEN.startsWith(to_do)){
+                    captureScreen(Tag.SCREEN.get(to_do));
                 }else if(Tag.VAR.startsWith(to_do)){
                     var(Tag.VAR.get(to_do),true);
                 }else if(Tag.CALCULATE.startsWith(to_do)){
@@ -610,7 +615,29 @@ public class Bot extends Robot
             }
             return true;
         }
-        
+        public void captureScreen(String in) throws IOException{
+            String options[] = in.split(" ");
+            Rectangle screenRectangle;
+            int x=0,y=0,w=0,l=0;
+            if(options.length>4){
+                try{x=Integer.parseInt(options[1]);}
+                catch(NumberFormatException e){x=Integer.parseInt(var(options[1]));}
+                try{y=Integer.parseInt(options[2]);}
+                catch(NumberFormatException e){y=Integer.parseInt(var(options[2]));}
+                try{w=Integer.parseInt(options[3]);}
+                catch(NumberFormatException e){w=Integer.parseInt(var(options[3]));}
+                try{l=Integer.parseInt(options[4]);}
+                catch(NumberFormatException e){l=Integer.parseInt(var(options[4]));}
+                screenRectangle = new Rectangle(x,y,w,l);
+            }else{
+                screenRectangle =  new Rectangle(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
+            }
+            String name = var(options[0]);
+            options[0] = name.isEmpty()?options[0]:name;             
+
+            BufferedImage image = createScreenCapture(screenRectangle);
+            ImageIO.write(image, "png", new File(name));               
+        }
         public void commands(String in) throws FileNotFoundException, IOException{
             String option[]=in.split(" ");
             if(option[0].toLowerCase().equals("load")){ 

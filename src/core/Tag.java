@@ -37,4 +37,5 @@ public class Tag{
     public static final Tag DESCRIP = new Tag("::DESCRIP");
     public static final Tag LOG = new Tag("LOG");
     public static final Tag COMMANDS = new Tag("COMMANDS");
+    public static final Tag SCREEN = new Tag("SCREEN");
 }
