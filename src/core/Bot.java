@@ -476,9 +476,8 @@ public class Bot extends Robot
                  if(stop)System.exit(0);
              }catch (InterruptedException ex) {}
             
-            in=in.trim();
-            if(in.toLowerCase().contains(Tag.VAR.tag+"::")){
-                in=get_var(in);
+            if(in.trim().toLowerCase().contains(Tag.VAR.tag+"::")){
+                in = get_var(in);
             }
             
             for(String to_do:in.split(",")){
@@ -632,9 +631,8 @@ public class Bot extends Robot
             }else{
                 screenRectangle =  new Rectangle(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
             }
-            String name = var(options[0]);
-            options[0] = name.isEmpty()?options[0]:name;             
-
+            String name = var(options[0].trim());
+            name = name.isEmpty()?options[0]:name;
             BufferedImage image = createScreenCapture(screenRectangle);
             ImageIO.write(image, "png", new File(name));               
         }
@@ -690,9 +688,7 @@ public class Bot extends Robot
                             x = 1+data[i].indexOf("->>");                            
                             data[i] = data[i].substring(x<0?0:x).replace(">>","");
                             if(i==end){
-                                data[i]="::"+data[i];
-                            }else if(data[i].toLowerCase().contains(Tag.VAR.tag+"::")){
-                                data[i]=get_var(data[i]);
+                                data[i] = "::"+data[i];
                             }
                             f.write(data[i].trim()+'\n');
                         }
@@ -766,12 +762,12 @@ public class Bot extends Robot
                 int count = 0;
                 String out = "";
                 mouse_pos();
-                System.out.println("VARS:")                    ;
+                System.out.println("VARS:");
                 for (Var var : VARS) {
                     count++;
                     out += ","+var.value;
                     if(Bot.MODE=='i'&&print)
-                        System.out.println(var.name+"\t"+var.value)                    ;
+                        System.out.println(var.name+"\t"+var.value);
                 }
                 return count+out;
             }
@@ -833,31 +829,27 @@ public class Bot extends Robot
             try {
                 FileWriter f = new FileWriter(name);
                 for(int i=0;i<data.length;i++) {
-                    if(data[i].toLowerCase().contains(Tag.VAR.tag+"::")){
-                        data[i]=get_var(data[i]);
-                    }
-                    f.write(data[i].trim()+'\n');
+                   f.write(data[i].trim()+'\n');
                 }
                 f.close();
             } catch (IOException ex) 
             {System.out.println("Err: Command no made");}
         } 
         private String get_var(String data){
-            String n ="",var;
+            String n,var;
             for(String v:data.replace("]", "").split(" ")){
-                if(v.startsWith(Tag.VAR.tag+"::")){
-                    n=v.replace(Tag.VAR.tag+"::", "");
-                }else if(v.startsWith(Tag.VAR.tag.toUpperCase()+"::")){
-                    n=v.replace(Tag.VAR.tag.toUpperCase()+"::", "");
-                }                
-                if(!n.isEmpty()){
-                    var = var(n);
-                    if(!var.isEmpty()){
-                        data = data.replace(Tag.VAR.tag.toUpperCase()+"::"+n, var)
-                                 .replace(Tag.VAR.tag+"::"+n, var);
+                if(v.toLowerCase().contains(Tag.VAR.tag+"::")){
+                    n=v.replace(Tag.VAR.tag+"::", "").replace(Tag.VAR.tag.toUpperCase()+"::", "");
+                    if(!n.isEmpty()){
+                        var = var(n);
+                        if(!var.isEmpty()){
+                            data = data.replace(Tag.VAR.tag.toUpperCase()+"::"+n, var)
+                                     .replace(Tag.VAR.tag+"::"+n, var);
+                        }
                     }
-                }
+                }                
             }
+            System.out.println(data);
             return data;
         }
         //excecute tag now
