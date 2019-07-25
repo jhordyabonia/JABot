@@ -23,6 +23,7 @@ public class Tag{
     }
     public static final Tag MAKE = new Tag("MAKE");
     public static final Tag REPEAT = new Tag("REPEAT");
+    public static final Tag WHILE = new Tag("WHILE");
     public static final Tag IF = new Tag("IF");
     public static final Tag ELSE = new Tag("ELSE");
     public static final Tag WAIT = new Tag("WAIT");

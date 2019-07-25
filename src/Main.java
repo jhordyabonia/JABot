@@ -122,7 +122,7 @@ public class Main{
             }else if(args[0].contains("g")){
                 Bot.MODE = 'g';
                 graphicMode();
-            }else if(args[0].startsWith("s")){
+            }else if(args[0].contains("s")){
                 Bot.MODE = 's';
                 server(bot);
             }else if(args[0].contains("c")){

@@ -45,6 +45,7 @@ public class Bot extends Robot
         private String clipboard = "";
         public static int step=0;
         private static String path_fail="";
+        private static Bot sub=null;
         public static String getLog(){
             String e=""+path_fail;
             path_fail=""; step=0;
@@ -56,7 +57,6 @@ public class Bot extends Robot
             step=0;
             var("TIME number "+System.currentTimeMillis());
             mouse_pos();
-
         }
         public String[] get_dictionary(){
             return dictionary;
@@ -460,9 +460,12 @@ public class Bot extends Robot
             }       
         }    
         public boolean Do_(String in) throws IOException{            
+            return Do_(in,true);
+        }
+        public boolean Do_(String in,boolean l) throws IOException{            
             if(in==null)return false;
             var("TIME number "+System.currentTimeMillis());
-            if(LOG){  
+            if(LOG&&l){  
                 path_fail+="\n#"+step++;
                 for(int u=step;u>=0;u--)
                     path_fail+=" ";
@@ -481,7 +484,7 @@ public class Bot extends Robot
             }
             
             for(String to_do:in.split(",")){
-                if(LOG)
+                if(LOG&&l)
                     path_fail+=">>"+to_do;
                 if(to_do==null)continue;
                 if(Tag.MAKE.in_catch){
@@ -502,9 +505,10 @@ public class Bot extends Robot
                         }catch(NumberFormatException e){
                             repeat=Integer.parseInt(var(sent));                    
                         } 
+
                         for(int i=0;i<repeat;i++)
-                         if(!Do_(Tag.REPEAT.catched))
-                            return false;
+                            if(!Do_(Tag.REPEAT.catched,false))
+                                return false;
                         Tag.REPEAT.catched="";                            
                     }else {
                         Tag.REPEAT.catched+=","+to_do;
@@ -526,7 +530,7 @@ public class Bot extends Robot
                         Tag.ELSE.catched = "";
                         Tag.IF.args = "";
                         Tag.ELSE.args = "";
-                        if(!Do_(catched))
+                        if(!Do_(catched,false))
                             return false;
                     }else{                        
                         if(Tag.IF.in_catch){
@@ -534,6 +538,19 @@ public class Bot extends Robot
                         }else if(Tag.ELSE.in_catch){
                           Tag.ELSE.catched+=","+to_do;
                         }
+                    }
+                }else if(Tag.WHILE.in_catch){
+                    if(Tag.WHILE.ends(to_do)){
+                        Tag.WHILE.in_catch = false; 
+                        boolean whiles = var(Tag.WHILE.args).equals("true");                        
+                        while(whiles){
+                            if(!Do_(Tag.WHILE.catched,false)){
+                                return false;
+                            }
+                            whiles = var(Tag.WHILE.args).equals("true");
+                        }
+                    }else{
+                        Tag.WHILE.catched+=","+to_do;
                     }
                 }else if(Tag.DESCRIP.in_catch){    
                     if(Tag.DESCRIP.contains(to_do)){
@@ -576,6 +593,9 @@ public class Bot extends Robot
                 }else if(Tag.IF.startsWith(to_do)){
                     Tag.IF.args = Tag.IF.get(to_do);
                     Tag.IF.in_catch = true;
+                }else if(Tag.WHILE.startsWith(to_do)){
+                    Tag.WHILE.args = Tag.WHILE.get(to_do);
+                    Tag.WHILE.in_catch = true;
                 }else if(Tag.DELAY.startsWith(to_do)){                
                     to_do=Tag.DELAY.get(to_do);
                     try{
@@ -790,7 +810,7 @@ public class Bot extends Robot
             data[0]=data[1]="";
             String value = String.join(" ",data).trim();               
             if(!value.contains(" ")){
-                String v = var(value);
+                String v = var(value,false);
                 value = !v.isEmpty()?v:value;
             }
             if(pos!=-1){
@@ -820,7 +840,7 @@ public class Bot extends Robot
 
             String name = Tag.MAKE.args.replace("[MAKE ","").replace("[make ","").replace("]", "");
 
-            String _name = var(name);
+            String _name = var(name,false);
             if(!_name.isEmpty()&&!_name.contains(","))
                name = _name;
 

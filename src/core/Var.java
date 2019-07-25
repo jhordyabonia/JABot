@@ -51,6 +51,8 @@ public class Var{
                     _type = VAR_TYPE.bool;
                     if(op=='=')
                       _value = (Double.parseDouble(aa) == Double.parseDouble(bb))?"true":"false";
+                    else if(op=='!')
+                      _value = (Double.parseDouble(aa) != Double.parseDouble(bb))?"true":"false";
                     else if(op=='>')
                       _value = (Double.parseDouble(aa) > Double.parseDouble(bb))?"true":"false";
                     else if(op=='<')
