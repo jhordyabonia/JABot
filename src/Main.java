@@ -96,6 +96,30 @@ public class Main{
             Bot.DELAY= Integer.parseInt(num);
         }catch(NumberFormatException e){}
     }
+    private static void eyes(String filename)throws FileNotFoundException{
+        if(filename.isEmpty()){
+            Scanner teclado = new Scanner(System.in);
+            System.out.println("Ingresar ruta a la imagen:");
+            filename = teclado.nextLine();
+        }
+        eyes.Eyes.Asynchtask callBack = new eyes.Eyes.Asynchtask(){
+            @Override
+            public void processFinish(String result){                            
+                try{
+                    System.out.println(result);
+                    JSONObject obj = new JSONObject(result);
+                    //System.out.println(obj.getString("requestId"));
+                }catch(Exception e){
+                    System.err.println(e.getMessage());
+                }
+            }
+        };
+        String url = eyes.Eyes.uriBase+eyes.Eyes.requestParameters+"&details";
+        //String url = eyes.Eyes.uriBase+eyes.Eyes.methods[0];
+        Eyes eyes  = new Eyes(url,callBack, filename);
+        new Thread(eyes).start();
+        System.err.println(url);
+    }
     public static void main(String[] args) 
     { 
         try{
@@ -114,24 +138,8 @@ public class Main{
             }
             
             if(args[0].contains("a")){
-                eyes.Eyes.Asynchtask callBack = new eyes.Eyes.Asynchtask(){
-                    @Override
-                    public void processFinish(String result){
-                            //System.out.println(result);
-                        try{
-                            //result = "{\"phonetype\":\"N95\",\"cat\":\"WP\"}";
-                            //System.out.println(result);
-                            JSONObject obj = new JSONObject(result);
-                            System.out.println(obj.getString("requestId"));
-                        }catch(Exception e){
-                            System.err.println(e.getMessage());
-                        }
-                    }
-                };
-                String filename = "0.png";
-                String url = eyes.Eyes.uriBase+eyes.Eyes.requestParameters;
-                Eyes eyes  = new Eyes(url,callBack, filename);
-                new Thread(eyes).start();
+               eyes("");
+               return;
             }else if(args[0].contains("h")){
                 System.out.println(help());
             }else if(args[0].contains("d")){

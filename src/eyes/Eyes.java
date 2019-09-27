@@ -20,9 +20,15 @@ public class Eyes implements Runnable
         public void processFinish(String result);
 
     }
-    public static String uriBase = "https://westcentralus.api.cognitive.microsoft.com/vision/v2.1/analyze";
+    public static String uriBase = "https://westcentralus.api.cognitive.microsoft.com/vision/v2.1/";
+    public static String methods [] = {
+        "analyze",
+        "read/core/asyncBatchAnalyze",
+        "recognizeText"
+    };
     public static String subscriptionKey = "f7f45ffb741841bfb45f6b9873710f5d";
-    public static String requestParameters = "?visualFeatures=Categories,Description,Color";
+    public static String arrayParams[] = {"Adult","Categories","Color","Description","Faces","ImageType","Tags"};
+    public static String requestParameters = methods[0]+"?visualFeatures="+String.join(",",arrayParams);
      
 	private URL connectURL;
     private String fileName;
@@ -34,10 +40,10 @@ public class Eyes implements Runnable
     {
     	this.urlString = urlString;
         this.callBack = callBack;
-        this.fileName = fileName;   
+        this.fileName = fileName;          
     	fileInputStream = new FileInputStream(fileName);
     } 
-    public Eyes(String urlString, String params, String fileName ) throws FileNotFoundException
+    public Eyes(String urlString,String fileName ) throws FileNotFoundException
     {
     	this.urlString=urlString;
         this.fileName = fileName;   
@@ -60,32 +66,25 @@ public class Eyes implements Runnable
         String boundary = "*****";
         try
         {
-            //------------------ CLIENT REQUEST
- 
-            // Abrimos una conexión http con la URL
- 
+            //------------------ CLIENT REQUEST 
+            // Abrimos una conexión http con la URL 
             HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
  
             // Permitimos Inputs
             conn.setDoInput(true);
  
             // Permitimos Outputs
-            conn.setDoOutput(true);
- 
+            conn.setDoOutput(true); 
             // Deshabilitamos el uso de la copia cacheada.
-            conn.setUseCaches(false);
- 
+            conn.setUseCaches(false); 
             // Usamos el método post esto podemos cambiarlo.
-            conn.setRequestMethod("POST");
- 
+            conn.setRequestMethod("POST"); 
             conn.setRequestProperty("Connection", "Keep-Alive");
-
             conn.setRequestProperty("Accept", "application/json");
             //conn.setRequestProperty("Content-Type", "application/octet-stream");
-            conn.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
- 
+            conn.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey); 
             conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
- 
+
             DataOutputStream dos = new DataOutputStream( conn.getOutputStream() );
  
             dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -101,16 +100,14 @@ public class Eyes implements Runnable
  
             int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
  
-            while (bytesRead > 0)
-            {
+            while (bytesRead > 0){
 	            dos.write(buffer, 0, bufferSize);
 	            bytesAvailable = fileInputStream.available();
 	            bufferSize = Math.min(bytesAvailable, maxBufferSize);
 	            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
             }
  
-            // enviar multipart form data
- 
+            // enviar multipart form data 
             dos.writeBytes(lineEnd);
             dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
  
@@ -147,8 +144,7 @@ public class Eyes implements Runnable
 	{
 		try
 		{
-		    Eyes htfu = 
-					new Eyes(url,"noparamshere", filename);
+		    Eyes htfu = new Eyes(url,filename);
 			Thread t=new Thread(htfu);
 			t.start();
 		}catch (FileNotFoundException e){}
