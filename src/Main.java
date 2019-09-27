@@ -114,8 +114,9 @@ public class Main{
                 }
             }
         };
-        String url = eyes.Eyes.uriBase+eyes.Eyes.requestParameters+"&details";
-        //String url = eyes.Eyes.uriBase+eyes.Eyes.methods[0];
+        //String url = eyes.Eyes.uriBase+eyes.Eyes.requestParameters+"&details";
+        //String url = eyes.Eyes.uriBase+eyes.Eyes.methods[1];
+        String url = eyes.Eyes.uriBase+eyes.Eyes.methods[2]+"?mode=Printed";
         Eyes eyes  = new Eyes(url,callBack, filename);
         new Thread(eyes).start();
         System.err.println(url);

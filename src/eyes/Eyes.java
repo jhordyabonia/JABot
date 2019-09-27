@@ -23,6 +23,8 @@ public class Eyes implements Runnable
     public static String uriBase = "https://westcentralus.api.cognitive.microsoft.com/vision/v2.1/";
     public static String methods [] = {
         "analyze",
+        "detect",
+        "recognizeText",
         "read/core/asyncBatchAnalyze",
         "recognizeText"
     };
