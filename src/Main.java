@@ -2,10 +2,15 @@ import core.Bot;
 import Tools.*;
 import COM.*;
 import COM.Connection.UserConnection;
+import eyes.*;
 import gui.*;
 import java.awt.AWTException; 
 import java.util.Scanner;
 import java.io.*;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 
@@ -108,9 +113,28 @@ public class Main{
                setDelay(args[0]);
             }
             
-            if(args[0].contains("h"))
+            if(args[0].contains("a")){
+                eyes.Eyes.Asynchtask callBack = new eyes.Eyes.Asynchtask(){
+                    @Override
+                    public void processFinish(String result){
+                            //System.out.println(result);
+                        try{
+                            //result = "{\"phonetype\":\"N95\",\"cat\":\"WP\"}";
+                            //System.out.println(result);
+                            JSONObject obj = new JSONObject(result);
+                            System.out.println(obj.getString("requestId"));
+                        }catch(Exception e){
+                            System.err.println(e.getMessage());
+                        }
+                    }
+                };
+                String filename = "0.png";
+                String url = eyes.Eyes.uriBase+eyes.Eyes.requestParameters;
+                Eyes eyes  = new Eyes(url,callBack, filename);
+                new Thread(eyes).start();
+            }else if(args[0].contains("h")){
                 System.out.println(help());
-            else if(args[0].contains("d")){
+            }else if(args[0].contains("d")){
                 Bot.MODE = 'd';
                 bot.Do(args.length>1?args[1]:null,args.length>2?args[2]:null);
             }else if(args[0].contains("r")){
