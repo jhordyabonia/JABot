@@ -28,9 +28,17 @@ public class Eyes implements Runnable
         "read/core/asyncBatchAnalyze",
         "recognizeText"
     };
+    public static String HELP;
+    static{
+        StringBuilder builder = new StringBuilder();
+        for(int t=0;t<methods.length;t++){
+            builder.append("\t\ta"+t+" = "+methods[t]+"\n");
+        }
+        HELP = builder.toString();
+    }
+    
     public static String subscriptionKey = "f7f45ffb741841bfb45f6b9873710f5d";
     public static String arrayParams[] = {"Adult","Categories","Color","Description","Faces","ImageType","Tags"};
-    public static String requestParameters = methods[0]+"?visualFeatures="+String.join(",",arrayParams);
      
 	private URL connectURL;
     private String fileName;
@@ -38,16 +46,21 @@ public class Eyes implements Runnable
 	private String urlString;
 	private String response;
     private Asynchtask callBack;
-    public Eyes(String urlString, Asynchtask callBack, String fileName ) throws FileNotFoundException
+    private int API = 0;
+    public Eyes setApi(int a){ 
+        this.API = a;
+        return this;
+    }
+    public Eyes(int api, Asynchtask callBack, String fileName ) throws FileNotFoundException
     {
-    	this.urlString = urlString;
+    	this.API = api;
         this.callBack = callBack;
         this.fileName = fileName;          
     	fileInputStream = new FileInputStream(fileName);
     } 
-    public Eyes(String urlString,String fileName ) throws FileNotFoundException
+    public Eyes(int api,String fileName ) throws FileNotFoundException
     {
-    	this.urlString=urlString;
+    	this.API = api;
         this.fileName = fileName;   
     	fileInputStream = new FileInputStream(fileName);
         this.callBack = new Asynchtask(){
@@ -135,20 +148,18 @@ public class Eyes implements Runnable
 	@Override
 	public void run() 
 	{
-		try 
-		{
-			connectURL = new URL(urlString);
-			thirdTry();
+		try{
+            if(this.API==0){
+                this.urlString = this.methods[this.API]+"?visualFeatures="+String.join(",",this.arrayParams)+"&details";
+            }else if (API == 2){
+                this.urlString = this.methods[this.API]+"?mode=Printed";
+            }else{
+                this.urlString = this.methods[this.API];
+            }
+			this.connectURL = new URL(this.uriBase+this.urlString);
+            this.thirdTry();
+            System.out.println(this.uriBase+this.urlString);
 		} catch (MalformedURLException e) {}
 		
-	}
-	public static void uploadFile(String url,String filename)
-	{
-		try
-		{
-		    Eyes htfu = new Eyes(url,filename);
-			Thread t=new Thread(htfu);
-			t.start();
-		}catch (FileNotFoundException e){}
 	}
 }

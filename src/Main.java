@@ -30,7 +30,7 @@ public class Main{
         "p \tRun phanton mode","\tUse p <server>","\tEx: p 192.168.0.18","",
         "t \tSet delay between each action","\tUse ?t#### \tWhere # is integer 0-1","\tEx: st0 \tset delay 0","\tEx: st100 \tset delay 100","",
         "l \tActive Error Log ","\tUse ?l <agrs> ","\tEx: dl SYSTEM RUN ","",        
-        "",
+        "a \tApi vision","\tUse a? <name-file> \n\n\tOptions:",Eyes.HELP,"\tEx: a0 picture.jpg",
         "",
         ""
     };    
@@ -96,7 +96,7 @@ public class Main{
             Bot.DELAY= Integer.parseInt(num);
         }catch(NumberFormatException e){}
     }
-    private static void eyes(String filename)throws FileNotFoundException{
+    private static void eyes(int api,String filename)throws FileNotFoundException{
         if(filename.isEmpty()){
             Scanner teclado = new Scanner(System.in);
             System.out.println("Ingresar ruta a la imagen:");
@@ -114,12 +114,9 @@ public class Main{
                 }
             }
         };
-        //String url = eyes.Eyes.uriBase+eyes.Eyes.requestParameters+"&details";
-        //String url = eyes.Eyes.uriBase+eyes.Eyes.methods[1];
-        String url = eyes.Eyes.uriBase+eyes.Eyes.methods[2]+"?mode=Printed";
-        Eyes eyes  = new Eyes(url,callBack, filename);
-        new Thread(eyes).start();
-        System.err.println(url);
+        Eyes var_eyes  = new Eyes(api, callBack, filename);
+        new Thread(var_eyes).start();
+        System.err.println(eyes.Eyes.methods[api]+"\t"+filename);
     }
     public static void main(String[] args) 
     { 
@@ -139,8 +136,12 @@ public class Main{
             }
             
             if(args[0].contains("a")){
-               eyes("");
-               return;
+               String _api = args[0].replace("a","").replace("-","");
+               if(_api.isEmpty()){
+                   _api = "0";
+               }
+               int api = Integer.parseInt(_api);
+               eyes(api,args.length>1?args[1]:"");
             }else if(args[0].contains("h")){
                 System.out.println(help());
             }else if(args[0].contains("d")){
