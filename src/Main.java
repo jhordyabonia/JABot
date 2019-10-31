@@ -13,6 +13,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import java.net.*;
+import java.util.Scanner;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import java.awt.Robot; 
+import java.awt.Toolkit;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.nio.ByteBuffer.*;
 
 public class Main{
 
@@ -61,6 +73,21 @@ public class Main{
             run = true;
             p.connect(host);
         }catch(AWTException e){}
+    }
+
+    private static void serverImage(Bot bot,String host){
+        try{
+            String args [] ={host};
+            ServerImage.main(args);
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+    private static void viewer(Bot bot,String host){
+        try{
+            String args [] ={host};
+            Viewer.main(args);
+        }catch(AWTException|FileNotFoundException e){}
     }
     private static void server(Bot bot){
        
@@ -165,7 +192,16 @@ public class Main{
             }else if(args[0].contains("p")){
                 Bot.MODE = 'p';
                 phanton(bot,args.length>1?args[1]:"localhost");     
-            }  
+            }else if(args[0].contains("v")){
+                Bot.MODE = 'v';
+                viewer(bot,args.length>1?args[1]:"localhost");     
+            }else if(args[0].contains("j")){
+                Bot.MODE = 'j';
+                serverImage(bot,args.length>1?args[1]:"localhost");     
+            }else if(args[0].contains("q")){
+                Bot.MODE = 'q';
+                reciveImage(args);     
+            }
         }catch(Exception e){
             System.err.println(e.getMessage());
             System.out.println(error+")Bot Error:\n"+Bot.getLog());
@@ -175,5 +211,20 @@ public class Main{
                 main(args);
             }
         } 
+    }
+
+    public static void reciveImage(String[] args) throws Exception {
+        try{
+            Socket socket = new Socket("localhost", Connection.PORT);
+            InputStream inputStream = socket.getInputStream(); 
+            BufferedImage image = ImageIO.read(inputStream);
+ 
+            //System.out.println("Received " + image.getHeight() + "x" + image.getWidth() + ": " + System.currentTimeMillis());
+            ImageIO.write(image, "png", new File("result.png"));
+
+            socket.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }

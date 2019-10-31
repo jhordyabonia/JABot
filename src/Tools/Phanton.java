@@ -33,13 +33,13 @@ import javax.swing.JLabel;
  */
 public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener 
 {
-    private int MOUSE_TOLERANCE = 2, MOUSE_X = -1, MOUSE_Y = -1;
-    private Client client = null;
+    private int MOUSE_TOLERANCE = 2, MOUSE_X = -1, MOUSE_Y = -1;    
     private PrintStream outL;
     private static long T=1;
-    private boolean rec = false;
     private JLabel R = new JLabel("R°");
     private long TIME = System.currentTimeMillis();
+    protected Client client = null;
+    protected boolean rec = false;
     
     public Phanton() throws AWTException{
         super();
@@ -179,10 +179,10 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
     private String key(Integer k){
         return KeyEvent.getKeyText(k).toUpperCase();    
     }     
-  
+    /*
     public static void main(String[] args) throws AWTException {   
         // TODO code application logic here
         Phanton p = new Phanton();
         p.setVisible(true);
-    }
+    }*/
 }
