@@ -64,47 +64,53 @@ import java.awt.Dimension;
  *
  * @author jhord_000
  */
-public class Viewer extends JFrame implements ImageObserver, Runnable
+public class Viewer extends Phanton implements ImageObserver, Runnable
 {   
-    private int index = 1,seccions = 1, width = 0;
+    private int seccions = 1, width = 0;
     protected String host = "localhost";
     protected Graphics graphics;
     protected InputStream  file;
-    protected ImageCanvas lienzo = new ImageCanvas();
+    protected ImageCanvas lienzo;
     public Viewer(int seccions) throws AWTException{
         super();
-        
-        setUndecorated(true);
+        setFullScreen(false);
+        lienzo = new ImageCanvas(seccions);
+        lienzo.addKeyListener(this);
+        lienzo.addMouseMotionListener(this);
+        lienzo.addMouseListener(this);
+        lienzo.addMouseWheelListener(this);
         add(lienzo,BorderLayout.CENTER);
+        //setUndecorated(true);
         setVisible(true);
 
         this.seccions = seccions;
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        width = d.width;
+        width = d.width/seccions;
         setSize(d);
     }
     public void connect(String host){
         this.host = host;
         (new Thread(this)).start();
+        super.connect(host);
     }
     @Override
     public void run(){
         Socket socket = null; 
         try{
-            socket = new Socket(host, Connection.PORT);
+            socket = new Socket(host, Connection.POST_DISPLAY);
             InputStream inputStream = socket.getInputStream(); 
             BufferedImage image;
+            int index = 0;
             while(true){
                 if(index >= seccions){
-                    index = 1;
-                }else{
-                    index++;
+                    index = 0;
                 }
                 image = ImageIO.read(inputStream);
                 if(image!=null){
-                    lienzo.setImage(image,(width/seccions)*index,0);
+                    lienzo.setImage(index,image,width*index,0);
                     Viewer.this.getContentPane().repaint();
                 }
+                index++;
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -121,7 +127,7 @@ public class Viewer extends JFrame implements ImageObserver, Runnable
     public static void main(String[] args) throws AWTException, FileNotFoundException {   
         // TODO code application logic here
         String host = args.length>0?"localhost":args[0];
-        Viewer v = new Viewer(1);   
+        Viewer v = new Viewer(2);   
         v.connect(host);    
     }
 }

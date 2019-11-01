@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public abstract class Connection implements Runnable
 {     
     private ArrayList<String> buffer = new ArrayList();
-    public static int PORT = 5000;
+    public static int PORT = 5000,POST_DISPLAY = 5001;
     public static int DELAY = 100; 
     private boolean ACTIVE = false;
     protected boolean STOP = false;

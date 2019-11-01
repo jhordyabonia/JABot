@@ -17,7 +17,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import COM.Connection;
-import static COM.Connection.PORT;
+import static COM.Connection.POST_DISPLAY;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
@@ -34,11 +34,10 @@ public class ServerImage implements Runnable
     public ServerImage(int seccions){
         this.seccions = new Rectangle[seccions];
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = d.width/seccions,x=0;
-        int height = d.height/seccions;
+        int width = d.width/seccions;
+        int height = d.height;
         for (int index = 0; seccions>index; index++) {            
-            this.seccions[index] = new Rectangle(x,0,width,height);
-            x+=width;
+            this.seccions[index] = new Rectangle(index*width,0,width,height);
         }
     }
     public void start(){
@@ -49,22 +48,23 @@ public class ServerImage implements Runnable
     {
         while(true){ 
             try{      
-                ServerSocket sc = new ServerSocket(PORT);
+                ServerSocket sc = new ServerSocket(POST_DISPLAY);
                 Socket so = sc.accept();
                 int index = 0;
                 while(!sc.isClosed()){  
                     try {
                         if(index >= seccions.length){
                             index = 0;
+                            Thread.sleep(5000);
                         }
                         BufferedImage image = new Robot().createScreenCapture(seccions[index++]);                       
                         OutputStream outputStream = so.getOutputStream();
                         ImageIO.write(image, "png", outputStream);
                         outputStream.flush();
+                        System.gc();
                     }catch(Exception e){
                         e.printStackTrace();
                     }
-                    Thread.sleep(1000);
                 }
             }catch(Exception ex){
                 ex.printStackTrace();
@@ -73,8 +73,7 @@ public class ServerImage implements Runnable
     }
    
     public static void main(String []args) throws Exception{
-        ServerImage s = new ServerImage(1);        
-        //s.acepted();
+        ServerImage s = new ServerImage(2);    
         s.start();
     }
 

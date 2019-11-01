@@ -39,7 +39,7 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
     private JLabel R = new JLabel("R°");
     private long TIME = System.currentTimeMillis();
     protected Client client = null;
-    protected boolean rec = false;
+    protected boolean rec = false,fullscreen = true;
     
     public Phanton() throws AWTException{
         super();
@@ -65,6 +65,9 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
         client.setUser(u);
         client.startInteractive();
     }
+    public void setFullScreen(boolean in){
+        fullscreen = in;        
+    }
 
     private void make(PrintStream t)throws AWTException{
         outL=t;        
@@ -80,11 +83,12 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
         addMouseMotionListener(this);
         addMouseListener(this);
         addMouseWheelListener(this);
-
-        setBackground(new Color(0, 0, 0, 20));
+        
+        //setBackground(new Color(0, 0, 0, 20));
         setSize(Toolkit.getDefaultToolkit().getScreenSize());
-        for(AWTEventListener tt:Toolkit.getDefaultToolkit().getAWTEventListeners())
+        /*for(AWTEventListener tt:Toolkit.getDefaultToolkit().getAWTEventListeners())
                outL.println(tt.hashCode());
+        */
     }
 
     public void println(String s){
@@ -108,9 +112,14 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
         TIME = now; 
     }
     @Override
-    public void mouseClicked(MouseEvent e) {        
-        MOUSE_X=e.getXOnScreen();
-        MOUSE_Y=e.getYOnScreen();
+    public void mouseClicked(MouseEvent e) {  
+        if(fullscreen){
+            MOUSE_X=e.getXOnScreen();
+            MOUSE_Y=e.getYOnScreen();
+        }else{
+            MOUSE_X=e.getX();
+            MOUSE_Y=e.getY();
+        }
     }
     @Override
     public void mousePressed(MouseEvent e){
@@ -139,8 +148,14 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
 
     @Override
     public void mouseMoved(MouseEvent e){
-        Integer x=e.getXOnScreen();
-        Integer y=e.getYOnScreen();
+        Integer x,y;
+        if(fullscreen){
+             x=e.getXOnScreen();
+             y=e.getYOnScreen();
+        }else{
+             x=e.getX();
+             y=e.getY();
+        }
         if((MOUSE_X+MOUSE_TOLERANCE)<x)return;
         if((MOUSE_X-MOUSE_TOLERANCE)>x)return;
         if((MOUSE_Y+MOUSE_TOLERANCE)<y)return;

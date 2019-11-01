@@ -38,8 +38,10 @@ public class Main{
         "i \tRun interactive mode","\ttype any command one and other, and other... ","",
         "g \tRun graphic mode","",
         "s \tRun server mode","",
+        "j \tRun server mode with display (images)","\tUse j T\n\tT is display divide","\tEx: j 2\n",
         "c \tRun client mode","\tUse c <server>","\tEx: c 192.168.0.18","",
         "p \tRun phanton mode","\tUse p <server>","\tEx: p 192.168.0.18","",
+        "v \tRun viewer mode","\tUse v <server> T\n\tT is display divide","\tEx: v 192.168.0.18 2","",
         "t \tSet delay between each action","\tUse ?t#### \tWhere # is integer 0-1","\tEx: st0 \tset delay 0","\tEx: st100 \tset delay 100","",
         "l \tActive Error Log ","\tUse ?l <agrs> ","\tEx: dl SYSTEM RUN ","",        
         "a \tApi vision","\tUse a? <name-file> \n\n\tOptions:",Eyes.HELP,"\tEx: a0 picture.jpg",
@@ -74,20 +76,21 @@ public class Main{
             p.connect(host);
         }catch(AWTException e){}
     }
-
-    private static void serverImage(Bot bot,String host){
+    private static void viewer(Bot bot,String host,int seccions){
         try{
-            String args [] ={host};
-            ServerImage.main(args);
+            Viewer v = new Viewer(seccions);   
+            v.connect(host);
+            run = true;
+        }catch(AWTException e){}
+    }
+    private static void serverImage(Bot bot,String host,int seccions){
+        try{
+            ServerImage s = new ServerImage(seccions);    
+            s.start();
+            server(bot);
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
-    }
-    private static void viewer(Bot bot,String host){
-        try{
-            String args [] ={host};
-            Viewer.main(args);
-        }catch(AWTException|FileNotFoundException e){}
     }
     private static void server(Bot bot){
        
@@ -194,10 +197,14 @@ public class Main{
                 phanton(bot,args.length>1?args[1]:"localhost");     
             }else if(args[0].contains("v")){
                 Bot.MODE = 'v';
-                viewer(bot,args.length>1?args[1]:"localhost");     
+                String host = args.length>1?args[1]:"localhost";
+                int seccions = args.length>2?Integer.parseInt(args[2]):2;
+                viewer(bot,host,seccions);     
             }else if(args[0].contains("j")){
                 Bot.MODE = 'j';
-                serverImage(bot,args.length>1?args[1]:"localhost");     
+                String host = args.length>1?args[1]:"localhost";
+                int seccions = args.length>2?Integer.parseInt(args[2]):2;
+                serverImage(bot,host,seccions);     
             }else if(args[0].contains("q")){
                 Bot.MODE = 'q';
                 reciveImage(args);     
