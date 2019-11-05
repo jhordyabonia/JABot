@@ -32,24 +32,42 @@ public class Main{
     public static int error = 0;
     public static String[] HELP ={
         "",Bot.JABOT_VERSION,"",
-        "h \tDisplay this help","",
+        "h \tDisplay this help","\tUse OPTION, to show detailed help","\tEx: h j //(Show detailed help to Run on Server Image mode)","",
         "d \tRun File or Block into File ","\tUse  d <file> <block> ","\tEx: d SYSTEM RUN ","",
         "r \tRun any cammand ","\tUse  r COMMAND ","\tEx: r [MOUSE M 0 0]","",
         "i \tRun interactive mode","\ttype any command one and other, and other... ","",
         "g \tRun graphic mode","",
         "s \tRun server mode","",
-        "j \tRun server mode with display (images)","\tUse j T\n\tT is display divide","\tEx: j 2\n",
+        "j \tRun server mode with display (images)","\tUse j T D\n\tT is display divide, (2 is default)\n\tD is delay foreach sending (5 is default)","\tEx: j 2 5\n","",
         "c \tRun client mode","\tUse c <server>","\tEx: c 192.168.0.18","",
         "p \tRun phanton mode","\tUse p <server>","\tEx: p 192.168.0.18","",
-        "v \tRun viewer mode","\tUse v <server> T\n\tT is display divide","\tEx: v 192.168.0.18 2","",
+        "v \tRun viewer mode","\tUse v <server> T COMPLETEDMODE\n\tT is display divide, should be like the server (2 is default)",        
+            "\tCOMPLETEDMODE is optional, if is not present, send not mouse mevements, only the clicks","\tEx: v 192.168.0.18 2 COMPLETEDMODE","",
         "t \tSet delay between each action","\tUse ?t#### \tWhere # is integer 0-1","\tEx: st0 \tset delay 0","\tEx: st100 \tset delay 100","",
         "l \tActive Error Log ","\tUse ?l <agrs> ","\tEx: dl SYSTEM RUN ","",        
         "a \tApi vision","\tUse a? <name-file> \n\n\tOptions:",Eyes.HELP,"\tEx: a0 picture.jpg",
         "",
         ""
     };    
-    public static String help(){
-        return String.join("\n",HELP);
+    public static String help(String in){
+       
+        if(in.isEmpty()){
+            return String.join("\n",HELP);
+        }else{
+            String out = "";boolean readAbled = false;
+            for (String line : HELP) {
+                if(line.isEmpty()&&!out.isEmpty()){
+                    readAbled = false;
+                    break;
+                }else if(line.startsWith(in)){
+                    readAbled = true;
+                }
+                if(readAbled){
+                    out += line+"\n";
+                }
+            }
+            return out;
+        }
     }
     private static void graphicMode(){
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -76,16 +94,18 @@ public class Main{
             p.connect(host);
         }catch(AWTException e){}
     }
-    private static void viewer(Bot bot,String host,int seccions){
+    private static void viewer(Bot bot,String host,int seccions,boolean mode){
         try{
-            Viewer v = new Viewer(seccions);   
+            Viewer v = new Viewer(seccions);  
+            v.COMPLETED_MODE = mode;    
             v.connect(host);
             run = true;
         }catch(AWTException e){}
     }
-    private static void serverImage(Bot bot,String host,int seccions){
+    private static void serverImage(Bot bot,String host,int seccions,double delay){
         try{
-            ServerImage s = new ServerImage(seccions);    
+            ServerImage s = new ServerImage(seccions); 
+            s.DELAY = delay;
             s.start();
             server(bot);
         }catch(Exception e){
@@ -173,7 +193,7 @@ public class Main{
                int api = Integer.parseInt(_api);
                eyes(api,args.length>1?args[1]:"");
             }else if(args[0].contains("h")){
-                System.out.println(help());
+                System.out.println(help(args.length>1?args[1]:""));
             }else if(args[0].contains("d")){
                 Bot.MODE = 'd';
                 bot.Do(args.length>1?args[1]:null,args.length>2?args[2]:null);
@@ -199,12 +219,19 @@ public class Main{
                 Bot.MODE = 'v';
                 String host = args.length>1?args[1]:"localhost";
                 int seccions = args.length>2?Integer.parseInt(args[2]):2;
-                viewer(bot,host,seccions);     
+                boolean mode = false;
+                for (String param : args) {
+                    if(param.replace("_","").toUpperCase().contains("COMPLETED")){
+                        mode = true; break;
+                    }
+                }
+                viewer(bot,host,seccions,mode);     
             }else if(args[0].contains("j")){
                 Bot.MODE = 'j';
                 String host = args.length>1?args[1]:"localhost";
                 int seccions = args.length>2?Integer.parseInt(args[2]):2;
-                serverImage(bot,host,seccions);     
+                double deleay = args.length>3?Double.parseDouble(args[3]):5;
+                serverImage(bot,host,seccions,deleay);     
             }else if(args[0].contains("q")){
                 Bot.MODE = 'q';
                 reciveImage(args);     

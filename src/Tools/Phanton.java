@@ -33,6 +33,7 @@ import javax.swing.JLabel;
  */
 public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener 
 {
+    public boolean COMPLETED_MODE = true;
     private int MOUSE_TOLERANCE = 2, MOUSE_X = -1, MOUSE_Y = -1;    
     private PrintStream outL;
     private static long T=1;
@@ -84,11 +85,12 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
         addMouseListener(this);
         addMouseWheelListener(this);
         
-        //setBackground(new Color(0, 0, 0, 20));
-        setSize(Toolkit.getDefaultToolkit().getScreenSize());
-        /*for(AWTEventListener tt:Toolkit.getDefaultToolkit().getAWTEventListeners())
-               outL.println(tt.hashCode());
-        */
+        if(fullscreen){
+            setBackground(new Color(0, 0, 0, 20));
+            setSize(Toolkit.getDefaultToolkit().getScreenSize());
+            for(AWTEventListener tt:Toolkit.getDefaultToolkit().getAWTEventListeners())
+                outL.println(tt.hashCode());
+        }        
     }
 
     public void println(String s){
@@ -123,15 +125,22 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
     }
     @Override
     public void mousePressed(MouseEvent e){
+        if(!COMPLETED_MODE)
+            this.getPositionMouse(e); 
         println("[MOUSE "+btn(e.getButton())+" 0]"); 
     }
     @Override
     public void mouseReleased(MouseEvent e){
+        if(!COMPLETED_MODE)
+            this.getPositionMouse(e); 
         println("[MOUSE "+btn(e.getButton())+" 1]");
     }
 
     @Override
-    public void mouseWheelMoved(MouseWheelEvent e){   
+    public void mouseWheelMoved(MouseWheelEvent e){  
+        
+        if(!COMPLETED_MODE)
+            this.getPositionMouse(e); 
         println("[MOUSE W "+e.getWheelRotation()+"]");
     }
     
@@ -148,21 +157,9 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
 
     @Override
     public void mouseMoved(MouseEvent e){
-        Integer x,y;
-        if(fullscreen){
-             x=e.getXOnScreen();
-             y=e.getYOnScreen();
-        }else{
-             x=e.getX();
-             y=e.getY();
-        }
-        if((MOUSE_X+MOUSE_TOLERANCE)<x)return;
-        if((MOUSE_X-MOUSE_TOLERANCE)>x)return;
-        if((MOUSE_Y+MOUSE_TOLERANCE)<y)return;
-        if((MOUSE_Y-MOUSE_TOLERANCE)>y)return;
-        MOUSE_X = x;
-        MOUSE_Y = y;
-        println("[MOUSE M "+x+" "+y+"]"); 
+        if(!COMPLETED_MODE)
+            return;
+        this.getPositionMouse(e);
     }           
 
     @Override
@@ -191,6 +188,23 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
         }
     } 
 
+    private void getPositionMouse(MouseEvent e){
+        Integer x,y;
+        if(fullscreen){
+             x=e.getXOnScreen();
+             y=e.getYOnScreen();
+        }else{
+             x=e.getX();
+             y=e.getY();
+        }
+        if((MOUSE_X+MOUSE_TOLERANCE)<x)return;
+        if((MOUSE_X-MOUSE_TOLERANCE)>x)return;
+        if((MOUSE_Y+MOUSE_TOLERANCE)<y)return;
+        if((MOUSE_Y-MOUSE_TOLERANCE)>y)return;
+        MOUSE_X = x;
+        MOUSE_Y = y;
+        println("[MOUSE M "+x+" "+y+"]"); 
+    }
     private String key(Integer k){
         return KeyEvent.getKeyText(k).toUpperCase();    
     }     

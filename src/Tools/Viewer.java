@@ -80,7 +80,6 @@ public class Viewer extends Phanton implements ImageObserver, Runnable
         lienzo.addMouseListener(this);
         lienzo.addMouseWheelListener(this);
         add(lienzo,BorderLayout.CENTER);
-        //setUndecorated(true);
         setVisible(true);
 
         this.seccions = seccions;

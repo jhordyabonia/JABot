@@ -30,6 +30,7 @@ import java.awt.Dimension;
  */
 public class ServerImage implements Runnable
 {   
+    public double DELAY = 5;
     private Rectangle[] seccions;
     public ServerImage(int seccions){
         this.seccions = new Rectangle[seccions];
@@ -48,6 +49,7 @@ public class ServerImage implements Runnable
     {
         while(true){ 
             try{      
+                Robot bot = new Robot();
                 ServerSocket sc = new ServerSocket(POST_DISPLAY);
                 Socket so = sc.accept();
                 int index = 0;
@@ -55,9 +57,9 @@ public class ServerImage implements Runnable
                     try {
                         if(index >= seccions.length){
                             index = 0;
-                            Thread.sleep(5000);
+                            Thread.sleep((int)DELAY*1000);
                         }
-                        BufferedImage image = new Robot().createScreenCapture(seccions[index++]);                       
+                        BufferedImage image = bot.createScreenCapture(seccions[index++]);                       
                         OutputStream outputStream = so.getOutputStream();
                         ImageIO.write(image, "png", outputStream);
                         outputStream.flush();
