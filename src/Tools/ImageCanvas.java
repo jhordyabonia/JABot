@@ -34,7 +34,6 @@ public class ImageCanvas extends Canvas {
                 height = img.getHeight();
             }
         }
-
         return  new Dimension(width,height);
     }
 

@@ -34,7 +34,7 @@ import javax.swing.JLabel;
 public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener 
 {
     public boolean COMPLETED_MODE = true;
-    private int MOUSE_TOLERANCE = 2, MOUSE_X = -1, MOUSE_Y = -1;    
+    private int MOUSE_TOLERANCE = 0, MOUSE_X = -1, MOUSE_Y = -1;    
     private PrintStream outL;
     private static long T=1;
     private JLabel R = new JLabel("R°");
@@ -135,8 +135,7 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
     }
 
     @Override
-    public void mouseWheelMoved(MouseWheelEvent e){  
-        
+    public void mouseWheelMoved(MouseWheelEvent e){ 
         if(!COMPLETED_MODE)
             this.getPositionMouse(e); 
         println("[MOUSE W "+e.getWheelRotation()+"]");
@@ -195,15 +194,17 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
              x=e.getX();
              y=e.getY();
         }
+        boolean out = true;
         if(COMPLETED_MODE){
-            if((MOUSE_X+MOUSE_TOLERANCE)<x)return;
-            if((MOUSE_X-MOUSE_TOLERANCE)>x)return;
-            if((MOUSE_Y+MOUSE_TOLERANCE)<y)return;
-            if((MOUSE_Y-MOUSE_TOLERANCE)>y)return;
+            int testX = MOUSE_X - x, testY = MOUSE_Y - y;
+            testX = testX>0?testX:testX*-1;
+            testY = testY>0?testY:testY*-1;
+            out = MOUSE_TOLERANCE > testX || MOUSE_TOLERANCE > testY;
         }
         MOUSE_X = x;
         MOUSE_Y = y;
-        println("[MOUSE M "+x+" "+y+"]"); 
+        if(!out)
+            println("[MOUSE M "+x+" "+y+"]"); 
     }
     private String key(Integer k){
         return KeyEvent.getKeyText(k).toUpperCase();    

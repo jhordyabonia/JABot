@@ -66,7 +66,7 @@ import java.awt.Dimension;
  */
 public class Viewer extends Phanton implements ImageObserver, Runnable
 {   
-    private int seccions = 1, width = 0;
+    private int seccions = 1;
     protected String host = "localhost";
     protected Graphics graphics;
     protected InputStream  file;
@@ -84,7 +84,6 @@ public class Viewer extends Phanton implements ImageObserver, Runnable
 
         this.seccions = seccions;
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        width = d.width/seccions;
         setSize(d);
     }
     public void connect(String host){
@@ -109,6 +108,11 @@ public class Viewer extends Phanton implements ImageObserver, Runnable
                     lienzo.setImage(index++,image);
                     getContentPane().repaint();
                 }
+                if(lienzo.getPreferredSize().getWidth()!=getSize().getWidth()
+                        ||lienzo.getPreferredSize().getHeight()!=getSize().getHeight()){
+                    setSize(lienzo.getPreferredSize());
+                }
+                //setSize(lienzo.getPreferredSize());
             }
         }catch(Exception e){
             e.printStackTrace();

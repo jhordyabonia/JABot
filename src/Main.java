@@ -38,10 +38,10 @@ public class Main{
         "i \tRun interactive mode","\ttype any command one and other, and other... ","",
         "g \tRun graphic mode","",
         "s \tRun server mode","",
-        "j \tRun server mode with display (images)","\tUse j T D\n\tT is display divide, (2 is default)\n\tD is delay foreach sending (5 is default)","\tEx: j 2 5\n","",
+        "j \tRun server mode with display (images)","\tUse j T D\n\tT is display divide, (1 is default)\n\tD is delay foreach sending (5 is default)","\tEx: j 2 5\n","",
         "c \tRun client mode","\tUse c <server>","\tEx: c 192.168.0.18","",
         "p \tRun phanton mode","\tUse p <server>","\tEx: p 192.168.0.18","",
-        "v \tRun viewer mode","\tUse v <server> T COMPLETEDMODE\n\tT is display divide, should be like the server (2 is default)",        
+        "v \tRun viewer mode","\tUse v <server> T COMPLETEDMODE\n\tT is display divide, should be like the server (1 is default)",        
             "\tCOMPLETEDMODE is optional, if is not present, send not mouse mevements, only the clicks","\tEx: v 192.168.0.18 2 COMPLETEDMODE","",
         "t \tSet delay between each action","\tUse ?t#### \tWhere # is integer 0-1","\tEx: st0 \tset delay 0","\tEx: st100 \tset delay 100","",
         "l \tActive Error Log ","\tUse ?l <agrs> ","\tEx: dl SYSTEM RUN ","",        
@@ -219,17 +219,13 @@ public class Main{
                 Bot.MODE = 'v';
                 String host = args.length>1?args[1]:"localhost";
                 int seccions = args.length>2?Integer.parseInt(args[2]):2;
-                boolean mode = false;
-                for (String param : args) {
-                    if(param.replace("_","").toUpperCase().contains("COMPLETED")){
-                        mode = true; break;
-                    }
-                }
+                String param = args.length>3?args[3]:"";
+                boolean mode = param.replace("_","").toUpperCase().contains("COMPLETED");                
                 viewer(bot,host,seccions,mode);     
             }else if(args[0].contains("j")){
                 Bot.MODE = 'j';
-                int seccions = args.length>2?Integer.parseInt(args[1]):2;
-                double delay = args.length>3?Double.parseDouble(args[2]):5;
+                int seccions = args.length>1?Integer.parseInt(args[1]):1;
+                double delay = args.length>2?Double.parseDouble(args[2]):0;
                 serverImage(bot,seccions,delay);     
             }else if(args[0].contains("q")){
                 Bot.MODE = 'q';
