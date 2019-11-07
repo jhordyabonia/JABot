@@ -102,7 +102,7 @@ public class Main{
             run = true;
         }catch(AWTException e){}
     }
-    private static void serverImage(Bot bot,String host,int seccions,double delay){
+    private static void serverImage(Bot bot,int seccions,double delay){
         try{
             ServerImage s = new ServerImage(seccions); 
             s.DELAY = delay;
@@ -228,10 +228,9 @@ public class Main{
                 viewer(bot,host,seccions,mode);     
             }else if(args[0].contains("j")){
                 Bot.MODE = 'j';
-                String host = args.length>1?args[1]:"localhost";
-                int seccions = args.length>2?Integer.parseInt(args[2]):2;
-                double deleay = args.length>3?Double.parseDouble(args[3]):5;
-                serverImage(bot,host,seccions,deleay);     
+                int seccions = args.length>2?Integer.parseInt(args[1]):2;
+                double delay = args.length>3?Double.parseDouble(args[2]):5;
+                serverImage(bot,seccions,delay);     
             }else if(args[0].contains("q")){
                 Bot.MODE = 'q';
                 reciveImage(args);     

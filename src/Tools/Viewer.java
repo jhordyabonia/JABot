@@ -106,10 +106,9 @@ public class Viewer extends Phanton implements ImageObserver, Runnable
                 }
                 image = ImageIO.read(inputStream);
                 if(image!=null){
-                    lienzo.setImage(index,image,width*index,0);
-                    Viewer.this.getContentPane().repaint();
+                    lienzo.setImage(index++,image);
+                    getContentPane().repaint();
                 }
-                index++;
             }
         }catch(Exception e){
             e.printStackTrace();

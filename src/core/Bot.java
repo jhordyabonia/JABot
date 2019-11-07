@@ -413,11 +413,14 @@ public class Bot extends Robot
             var("MOUSEY number "+(int) b.getY());
         }
         public void click(int btn,int x){
-             if(x==0)
-             { this.mousePress(btn);}
-             else if(x==1)
-             {this.mouseRelease(btn); }
-             else{this.mousePress(btn);this.mouseRelease(btn); }
+            if(x==0){
+              this.mousePress(btn);
+            }else if(x==1){
+                this.mouseRelease(btn); 
+            }else{
+                this.mousePress(btn);
+                this.mouseRelease(btn);
+            }
         }
         public void mouse_do(String to_do){
             PointerInfo a = MouseInfo.getPointerInfo();

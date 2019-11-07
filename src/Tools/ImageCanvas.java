@@ -13,50 +13,42 @@ import javax.imageio.ImageIO;
 
 public class ImageCanvas extends Canvas {
 
-    private class Pack{
-        public int posX=0,posY=0;
-        public BufferedImage img;
-        public Pack(BufferedImage in,int x,int y){
-            posX = x; posY = y; img = in;
-        }
-    }
-    private Pack[] imgs;
+    private BufferedImage[] imgs;
 
     public ImageCanvas(int length){
-        imgs = new Pack[length];
+        imgs = new BufferedImage[length];
     }
-    public void setImage(int index,BufferedImage in,int x,int y) throws IOException{
-        if(index<imgs.length){           
-            imgs[index] = new Pack(in,x,y);
+    public void setImage(int index,BufferedImage in) throws IOException{
+        if(index<imgs.length&&index<=0){           
+            imgs[index] = in;
             //ImageIO.write(in, "png", new File("viwer/"+index+".png"));//test  
             repaint();
         }
     }
     @Override
     public Dimension getPreferredSize() {
-        BufferedImage img = null;
-        for (Pack pack : imgs) {
-            if (pack != null) {
-                img = pack.img;
+        int width = 0, height = 0;
+        for (BufferedImage img : imgs) {
+            if (img != null) {
+                width = img.getWidth();
+                height = img.getHeight();
             }
         }
 
-        return  img == null ? 
-                new Dimension(200, 200) : 
-                new Dimension(img.getWidth(), img.getHeight());
+        return  new Dimension(width,height);
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        for (Pack pack : imgs) {
-            if (pack != null) {
-                g.drawImage(pack.img, pack.posX, pack.posY, this);  
-                System.gc();                  
+        int posX = 0;
+        for (BufferedImage img : imgs) {
+            if (img != null) {
+                g.drawImage(img, posX, 0, this);
+                posX += img.getWidth();
             }
-        }
-        
-        
+        }  
+        System.gc();                  
     }
 
 }
