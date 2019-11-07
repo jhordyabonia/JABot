@@ -34,11 +34,13 @@ import javax.swing.JLabel;
 public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener 
 {
     public boolean COMPLETED_MODE = true;
-    private int MOUSE_TOLERANCE = 0, MOUSE_X = -1, MOUSE_Y = -1;    
+    public int MOUSE_TOLERANCE = 0, SIZE_CACHE = 5;
+    private int MOUSE_X = -1, MOUSE_Y = -1, POS_CACHE = 0;    
     private PrintStream outL;
     private static long T=1;
     private JLabel R = new JLabel("R°");
     private long TIME = System.currentTimeMillis();
+    private String[] cache = {};
     protected Client client = null;
     protected boolean rec = false,fullscreen = true;
     
@@ -71,12 +73,15 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
     }
 
     private void make(PrintStream t)throws AWTException{
+        
+        cache = new String[SIZE_CACHE];
+
         outL=t;        
 
-        add(R,BorderLayout.NORTH);
         R.setFont(new java.awt.Font("Verdana",java.awt.Font.BOLD, 32)); 
         R.setForeground(Color.red); 
         R.setVisible(rec);
+        add(R,BorderLayout.NORTH);
         
         setUndecorated(true);
 
@@ -92,16 +97,35 @@ public class Phanton extends JFrame implements KeyListener,MouseListener,MouseMo
                 outL.println(tt.hashCode());
         }        
     }
-
+    private boolean cache(String s){
+        if(POS_CACHE >= SIZE_CACHE){
+            POS_CACHE = 0;
+        }
+        for(int i=0; i<cache.length;i++){
+            String c = cache [i];
+            if(c!=null){
+                if(c.startsWith("[MOUSE M") && s.startsWith("[MOUSE M")){                
+                    cache[POS_CACHE++] = s;
+                    //cache[i] = null;
+                    return false;
+                }
+            }
+        }
+        cache[POS_CACHE++] = s;
+        return true;
+    }
     public void println(String s){
         if(rec){
-            waiting();
-            if(T!=0)
-                outL.println("[WAIT "+(T*100)+"]");
-            outL.println(s);
-            if(client!=null)
-                client.write(s);
-            //System.out.println(s);
+            //String ss = cache(s);
+            //if(cache(s)){
+                waiting();
+                if(T!=0)
+                    outL.println("[WAIT "+(T*100)+"]");
+                outL.println(s);
+                if(client!=null)
+                    client.write(s);
+                //System.out.println(s);
+            //}
         } 
         
         T=0;        

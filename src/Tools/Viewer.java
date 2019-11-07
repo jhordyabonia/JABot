@@ -26,6 +26,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.PrintStream;
+import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.awt.BorderLayout;
@@ -59,7 +60,6 @@ import java.nio.ByteBuffer.*;
 import java.net.*;
 import java.awt.Dimension;
 
-
 /**
  *
  * @author jhord_000
@@ -68,8 +68,6 @@ public class Viewer extends Phanton implements ImageObserver, Runnable
 {   
     private int seccions = 1;
     protected String host = "localhost";
-    protected Graphics graphics;
-    protected InputStream  file;
     protected ImageCanvas lienzo;
     public Viewer(int seccions) throws AWTException{
         super();
@@ -106,7 +104,10 @@ public class Viewer extends Phanton implements ImageObserver, Runnable
                 image = ImageIO.read(inputStream);
                 if(image!=null){
                     lienzo.setImage(index++,image);
-                    getContentPane().repaint();
+                    //getContentPane().repaint();
+                    //SwingUtilities.updateComponentTreeUI(this);
+                    //SwingUtilities.updateTreeUI(this);
+                    //Viewer.this.validateTree();
                 }
                 if(lienzo.getPreferredSize().getWidth()!=getSize().getWidth()
                         ||lienzo.getPreferredSize().getHeight()!=getSize().getHeight()){
@@ -125,7 +126,6 @@ public class Viewer extends Phanton implements ImageObserver, Runnable
             }
         }
     }    
-
     public static void main(String[] args) throws AWTException, FileNotFoundException {   
         // TODO code application logic here
         String host = args.length>0?"localhost":args[0];
